@@ -1,0 +1,88 @@
+{% extends 'base.html' %} {% block conteudo %}
+<div class="flex flex-col py-2 lg:px-[33rem]">
+  <div class="mt-10 flex flex-col gap-6 bg-white shadow-lg rounded-lg p-6">
+    <h2
+      class="text-2xl font-semibold text-gray-900 text-left border-b border-gray-900/10 pb-4"
+    >
+      Avaliações dos Usuários
+    </h2>
+    {% if current_user.is_authenticated and current_user.is_client %}
+    <form
+      id="reviewForm"
+      action="{{ url_for('submit_review', restaurant_id=restaurante.ID_Restaurante) }}"
+      method="POST"
+      class="mt-4 flex flex-col gap-4"
+    >
+      <div class="flex items-center gap-2">
+        <label for="rating" class="text-gray-900">Nota:</label>
+        <input
+          type="number"
+          id="rating"
+          name="rating"
+          min="1"
+          max="5"
+          maxlength="1"
+          class="pl-2 block w-1/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6"
+        />
+      </div>
+      <textarea
+        id="review"
+        name="review"
+        rows="4"
+        maxlength="200"
+        placeholder="Escreva sua avaliação..."
+        class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6"
+      ></textarea>
+      <input type="hidden" id="date" name="date" />
+      <input type="hidden" id="time" name="time" />
+      <button
+        type="submit"
+        class="self-end bg-black text-white px-3 py-2 rounded-md hover:bg-gray-800 transition-colors duration-200 text-sm font-semibold"
+      >
+        Enviar
+      </button>
+    </form>
+    {% endif %}
+
+    <h3 class="text-xl font-semibold text-gray-900 text-left mt-4">
+      Feedbacks
+    </h3>
+    {% for feedback in feedbacks %}
+    <div
+      class="group flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 mt-4"
+    >
+      <div
+        class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500"
+      >
+        <span class="text-white text-xl">{{ feedback.usuario_inicial }}</span>
+      </div>
+      <div class="ml-4 flex flex-col items-start text-sm">
+        <div class="flex items-center">
+          <p>{{ feedback.usuario_nome }}</p>
+          <span class="ml-1">•</span>
+          <span
+            id="score_menu"
+            class="inline-flex items-center justify-center text-orange-400 ml-1"
+            >{{ feedback.nota }}
+            <img
+              src="../static/images/star-fill.svg"
+              alt=""
+              class="ml-1 w-4 h-4"
+            />
+          </span>
+        </div>
+        <p id="food-type-title" class="text-sm text-gray-500">
+          {{ feedback.comentario }}
+        </p>
+        <p id="date-time" class="text-sm text-gray-700">
+          Data: {{ feedback.data }} Hora: {{ feedback.hora }}
+        </p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
+
+{% endblock %}

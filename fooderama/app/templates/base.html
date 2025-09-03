@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fooderama</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="relative bg-gray-100">
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div
+      id="flash-messages"
+      class="absolute bottom-0 right-10 bg-neutral-600 p-6 rounded-lg shadow-lg text-sm"
+    >
+      {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+    <header class="bg-black">
+      <nav
+        class="mx-auto flex max-w-7xl items-center justify-between p-2 lg:px-8"
+        aria-label="Global"
+      >
+        <div class="flex lg:flex-1">
+          <a href="#" class="-m-1.5 p-1.5">
+            <span class="sr-only">Your Company</span>
+            <img class="h-8 w-auto" src="../static/images/gag.jpg" alt="" />
+          </a>
+        </div>
+        <div class="flex space-x-12">
+          {% if current_user.id_endereco %}
+          <a href="/index" class="text-sm/6 font-semibold text-white"
+            >Página Inicial</a
+          >
+          <a href="/cadastrar_comida" class="text-sm/6 font-semibold text-white"
+            >Cadastrar Comida</a
+          >
+          <a href="/historico_rest" class="text-sm/6 font-semibold text-white"
+            >Controle</a
+          >
+          <a
+            href="/restaurant?restaurant_id={{ current_user.id }}&food-type={{ current_user.tipo_culinaria | lower }}"
+            class="text-sm/6 font-semibold text-white"
+            >Perfil</a
+          >
+          {% elif current_user.id %}
+          <a href="/index" class="text-sm/6 font-semibold text-white"
+            >Página Inicial</a
+          >
+          <a
+            href="/cadastrar_endereco"
+            class="text-sm/6 font-semibold text-white"
+            >Cadastrar Endereço</a
+          >
+          <a
+            href="/historico_cliente"
+            class="text-sm/6 font-semibold text-white"
+            >Histórico</a
+          >
+          {% else %} {% endif %}
+        </div>
+        <div
+          class="hidden lg:flex lg:flex-1 lg:justify-end space-x-5 items-center"
+        >
+          <!-- Botão de Sair -->
+          {% if current_user.is_authenticated %}
+          <a
+            href="/logout"
+            class="text-sm font-semibold text-red-500 border-2 border-red-500 rounded-md px-3.5 py-1"
+            >Sair</a
+          >
+          <!-- Botão de Entrar -->
+          {% else %}
+          <a href="/autenticar_login" class="text-sm font-semibold text-white"
+            >Entrar <span aria-hidden="true">&rarr;</span></a
+          >
+          <!-- Botão do Carrinho -->
+          {% endif %}
+        </div>
+      </nav>
+    </header>
+
+    {% block conteudo %} {% endblock %}
+
+    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+  </body>
+</html>
