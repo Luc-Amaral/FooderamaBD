@@ -10,9 +10,6 @@
             <h2 class="text-start text-3xl font-bold tracking-tight text-gray-900">{{ restaurante.NomeRestaurante }}
             </h2>
             <div class="flex items-center gap-2">
-                <button id="cartButton" class="text-sm font-semibold flex items-center gap-2">
-                    <img src="../static/images/carrinho.svg" alt="Carrinho" class="w-7 h-7">
-                </button>
                 <a href="/feedback?restaurant_id={{ restaurante.ID_Restaurante }}"
                     class="text-sm font-semibold bg-black text-[#D2FF5A] rounded-md px-3.5 py-1.5 hover:bg-gray-800 active:bg-[#D2FF5A] active:text-black transition-colors duration-100">
                     Avaliações da Loja
@@ -24,12 +21,10 @@
             <!-- Produtos com popup -->
             {% for prato in pratos %}
             {% if prato.StatusDisponibilidade == 1 %}
-            <!-- Modal toggle -->
-            <button data-modal-target="{% if current_user.id_endereco %} res {%else%}static-modal{%endif%}"
-                data-modal-toggle="{% if current_user.id_endereco %} res {%else%}static-modal{%endif%}"
-                data-prato='{{ prato | tojson }}' data-food-type="{{ food_type }}"
-                data-enderecos='{{ enderecos | tojson }}'
-                class="{% if current_user.id_endereco %} res {%else%}open-modal-btn group{%endif%} flex items-center border-[1px] border-re rounded-3xl px-2 py-2 hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300"
+            <!-- Card do prato disponível -->
+            <button 
+                onclick="abrirModalPrato('{{ prato.ID_Prato }}', '{{ restaurante.ID_Restaurante }}', '{{ prato.Nome }}', '{{ prato.Descricao }}', {{ prato.Preco }}, {{ prato.Estoque }}, '{{ restaurante.NomeRestaurante }}')"
+                class="flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300"
                 type="button">
                 <div class="w-32 h-32 overflow-hidden rounded-2xl bg-gray-200">
                     <img src="../static/images/tipos_comida/{{ food_type }}.png" alt="{{ food_type }}"
@@ -39,7 +34,7 @@
                     <p class="text-xl">{{ prato.Nome }}</p>
                     <p class="text-gray-500 line-clamp-2 text-left overflow-hidden">{{ prato.Descricao }}</p>
                     <div class="flex justify-between w-full pt-2">
-                        <div></div>
+                        <div class="text-sm text-gray-400">Estoque: {{ prato.Estoque }}</div>
                         <p class="text-end flex items-end font-bold text-base"><span>R$</span>{{
                             '%.2f'|format(prato.Preco) }}</p>
                     </div>
@@ -47,15 +42,11 @@
             </button>
             {% endif %}
             {% if prato.StatusDisponibilidade == 0 and current_user.id_endereco == restaurante.ID_Endereco_FK %}
-            <button data-modal-target="{% if current_user.id_endereco %} res {%else%}static-modal{%endif%}"
-                data-modal-toggle="{% if current_user.id_endereco %} res {%else%}static-modal{%endif%}"
-                data-prato='{{ prato | tojson }}' data-food-type="{{ food_type }}"
-                data-enderecos="{{ enderecos | tojson }}"
-                class="{% if current_user.id_endereco %} res {%else%}open-modal-btn group{%endif%} flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300"
-                type="button">
+            <!-- Card do prato indisponível -->
+            <div class="flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 opacity-50 cursor-not-allowed">
                 <div class="w-32 h-32 overflow-hidden rounded-2xl bg-gray-200">
                     <img src="../static/images/tipos_comida/{{ food_type }}.png" alt="{{ food_type }}"
-                        class="h-full w-full object-cover object-center group-hover:opacity-75 filter grayscale">
+                        class="h-full w-full object-cover object-center filter grayscale">
                 </div>
                 <div class="ml-4 flex flex-col items-start text-sm w-3/5 max-w-full overflow-hidden">
                     <p class="text-xl">{{ prato.Nome }}</p>
@@ -66,154 +57,170 @@
                             '%.2f'|format(prato.Preco) }}</p>
                     </div>
                 </div>
-            </button>
+            </div>
             {% endif %}
             {% endfor %}
         </div>
     </div>
 </div>
 
-<!-- Main modal -->
-<div id="static-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
-    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative p-4 w-full max-w-2xl max-h-full">
-        <!-- Modal content -->
-        <form id="addToCartForm" class="relative bg-white rounded-lg shadow transition-transform duration-300">
-            <!-- Modal header -->
-            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-900/10">
-                <h3 id="modalPratoNome" classcd ="text-xl font-semibold text-gray-900 dark:text-black"></h3>
-                <button type="button"
-                    class="text-gray-400 bg-transparent hover:bg-black hover:text-white rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-black dark:hover:text-white"
-                    data-modal-hide="static-modal">
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                    </svg>
-                    <span class="sr-only">Close modal</span>
-                </button>
-            </div>
-            <!-- Modal body -->
-            <div class="p-4 md:p-5 space-y-4">
-                <div class="flex flex-row">
-                    <!-- Imagem à esquerda -->
-                    <div class="w-2/5 bg-gray-200">
-                        <img id="modalPratoImagem" src="" alt="" class="w-full h-full object-cover">
-                    </div>
-
-                    <!-- Informações à direita -->
-                    <div class="w-3/5 p-5 flex flex-col">
-                        <h2 id="modalPratoNome" class="text-xl mb-2"></h2>
-                        <p id="modalPratoDescricao" class="text-base text-gray-500 mb-4"></p>
-                        <p id="modalPratoPreco" class="text-4xl text-gray-800 font-bold mb-2"></p>
-                        <!-- Campo de exibição de endereço -->
-                        <div id="enderecosContainer" class="flex flex-col mt-2">
-                            <label for="address" class="block text-sm font-medium text-gray-900 mb-2">Endereço</label>
-                            <div class="flex flex-col gap-1 border-b">
-                                <!-- Endereços serão inseridos aqui -->
-                            </div>
-                        </div>
-
-                        <a href="#" id="changeAddressBtn"
-                            class="w-3/12 rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 flex items-center justify-center mt-4 mb-3">Trocar</a>
-
-                        <!-- Controle de quantidade e botão de adicionar -->
-                        <div class="flex flex-col w-1/2">
-                            <label for="quantidade" class="block text-sm font-medium text-gray-900">Quantidade</label>
-                            <input type="number" name="quantidade" value="1" min="1"
-                                class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Modal footer -->
-            <div
-                class="flex items-center justify-between p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-900/10">
-                <div id="totalValue" class="text-lg font-bold text-gray-800">Valor total: R$ 0.00</div>
-                <button type="submit"
-                    class="text-white bg-black hover:bg-gray-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-black dark:hover:bg-gray-800">Adicionar
-                    ao carrinho</button>
-            </div>
-        </form>
-    </div>
+<!-- Botão do carrinho flutuante -->
+<div id="cart-button" class="fixed bottom-5 right-5 z-40 hidden">
+  <button 
+    onclick="abrirCheckout()" 
+    class="bg-orange-500 hover:bg-orange-600 text-white rounded-full p-3 shadow-lg flex items-center gap-2"
+  >
+    <img src="../static/images/carrinho.svg" alt="Carrinho" class="w-6 h-6">
+    <span id="cart-count" class="bg-white text-orange-500 rounded-full px-2 py-1 text-sm font-bold">0</span>
+  </button>
 </div>
 
-<!-- CARRINHO -->
-<div id="cart" class="fixed top-0 right-0 w-80 h-full bg-white p-6 shadow-lg rounded-l-3xl text-sm space-y-4 hidden">
-    <header class="mb-4">
-        <span class="font-semibold text-4xl">Carrinho de compras</span>
-        <button id="closeCart" class="text-gray-400 hover:text-black float-right">
-            <i class="bx bx-x text-2xl"></i>
-        </button>
-    </header>
-    <div class="max-h-64 overflow-y-auto">
-        <table class="w-full">
-            <thead>
-                <tr class="border-b">
-                    <th class="py-2 text-left">Produto</th>
-                    <th class="py-2 text-left">Preço</th>
-                    <th class="py-2 text-left">Qtd</th>
-                    <th class="py-2 text-left">Total</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Itens do carrinho serão inseridos aqui -->
-            </tbody>
-        </table>
+{% if current_user.is_client %}
+<!-- Modal do Prato -->
+<div
+  id="prato-modal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+>
+  <div
+    class="bg-white rounded-lg p-0 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto"
+  >
+    <!-- Modal header -->
+    <div class="flex items-center justify-between p-4 border-b">
+      <h3 id="modalPratoNome" class="text-xl font-semibold text-gray-900"></h3>
+      <button
+        onclick="fecharModalPrato()"
+        class="text-gray-400 hover:text-gray-600 text-2xl"
+      >
+        &times;
+      </button>
     </div>
-    </section>
-    <footer class="mt-6 space-y-2">
-        <div class="flex justify-between">
-            <span>Sub-total:</span><span class="sub-total">R$ 0.00</span>
+
+    <!-- Modal body -->
+    <div class="p-4 space-y-4">
+      <div class="flex flex-row">
+        <!-- Imagem à esquerda -->
+        <div class="w-2/5 bg-gray-200">
+          <img
+            id="modalPratoImagem"
+            src="../static/images/fooderama.png"
+            alt=""
+            class="w-full h-48 object-cover rounded"
+          />
         </div>
 
-        <!-- Seção para escolher o método de pagamento -->
-        <div class="mt-4">
-            <span class="font-semibold text-lg">Método de Pagamento:</span>
-            <div class="mt-2">
-                <select name="payment_method" class="w-full p-2 border rounded-md">
-                    <option value="Default" disabled selected>---</option>
-                    <option value="pix">PIX</option>
-                    <option value="debito">Débito</option>
-                    <option value="credito">Crédito</option>
-                </select>
+        <!-- Informações à direita -->
+        <div class="w-3/5 p-5 flex flex-col">
+          <h2 id="modalPratoNome2" class="text-xl mb-2 font-semibold"></h2>
+          <p id="modalPratoDescricao" class="text-base text-gray-600 mb-4"></p>
+          <p
+            id="modalPratoPreco"
+            class="text-2xl text-orange-500 font-bold mb-4"
+          ></p>
+
+          <!-- Campo de endereço -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-900 mb-2"
+              >Endereço de Entrega</label
+            >
+            <select
+              id="modalEndereco"
+              class="w-full border border-gray-300 rounded-md px-3 py-2"
+            >
+              <option value="">Carregando endereços...</option>
+            </select>
+            <button
+              onclick="adicionarEndereco()"
+              class="mt-2 text-sm text-blue-500 hover:text-blue-700"
+            >
+              + Adicionar novo endereço
+            </button>
+          </div>
+
+          <!-- Controle de quantidade -->
+          <div class="flex flex-col mb-4">
+            <label class="block text-sm font-medium text-gray-900 mb-1"
+              >Quantidade</label
+            >
+            <div class="flex items-center gap-3">
+              <button
+                onclick="diminuirQuantidade()"
+                class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                id="modalQuantidade"
+                value="1"
+                min="1"
+                class="w-16 text-center border border-gray-300 rounded-md py-1"
+              />
+              <button
+                onclick="aumentarQuantidade()"
+                class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+              >
+                +
+              </button>
             </div>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <button
-            class="finalizar-compra mt-4 w-full text-xl font-semibold rounded-md bg-transparent border-2 border-black px-3 py-1.5 text-black shadow-sm active:border-gray-800 active:bg-gray-800 active:text-white duration-100">
-            Finalizar Compra
-        </button>
-    </footer>
+    <!-- Modal footer -->
+    <div class="flex items-center justify-between p-4 border-t">
+      <div id="modalValorTotal" class="text-lg font-bold text-gray-800">
+        Valor total: R$ 0,00
+      </div>
+      <button
+        onclick="adicionarAoCarrinho()"
+        class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+      >
+        Adicionar ao carrinho
+      </button>
+    </div>
+  </div>
 </div>
 
-<!-- Modal de Seleção de Endereços -->
-<div id="addressModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Selecionar Endereço</h3>
-                <button id="closeAddressModal" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            
-            <div id="addressList" class="max-h-60 overflow-y-auto">
-                <!-- Endereços serão carregados aqui via JavaScript -->
-            </div>
-            
-            <div class="mt-4 pt-4 border-t">
-                <button id="addNewAddressBtn" class="w-full px-4 py-2 bg-black text-white text-sm rounded-md hover:bg-gray-800">
-                    Cadastrar Novo Endereço
-                </button>
-            </div>
-        </div>
+<!-- Modal para finalizar compra -->
+<div
+  id="checkout-modal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+>
+  <div
+    class="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto"
+  >
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Carrinho</h2>
+      <button
+        onclick="fecharCheckout()"
+        class="text-gray-500 hover:text-gray-700 text-2xl"
+      >
+        &times;
+      </button>
     </div>
+
+    <div id="cart-items" class="mb-4">
+      <!-- Itens do carrinho serão inseridos aqui -->
+    </div>
+
+    <div
+      class="text-center text-lg font-bold text-orange-500 mb-4"
+      id="total-value"
+    >
+      Total: R$ 0,00
+    </div>
+
+    <button
+      onclick="finalizarPedido()"
+      class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium"
+    >
+      Confirmar Pedido
+    </button>
+  </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/restaurant.js') }}"></script>
+<script src="{{ url_for('static', filename='js/restaurant_new.js') }}"></script>
+{% endif %}
 
 {% endblock %}
