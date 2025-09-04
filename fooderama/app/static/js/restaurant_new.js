@@ -45,8 +45,6 @@ function abrirModalPrato(
 
   document.getElementById("modalPratoNome").textContent = nome;
   document.getElementById("modalPratoNome2").textContent = nome;
-  document.getElementById("modalPratoRestaurante").textContent =
-    nomeRestaurante;
   document.getElementById("modalPratoDescricao").textContent = descricao;
   document.getElementById("modalPratoPreco").textContent = `R$ ${preco.toFixed(
     2
@@ -240,16 +238,6 @@ function finalizarPedido() {
 // Adicionar novo endereço - abre em nova aba para não perder o pedido
 function adicionarEndereco() {
   window.open("/cadastrar_endereco", "_blank");
-}
-
-// Abrir página do restaurante em nova aba
-function abrirRestaurante() {
-  if (currentPrato && currentPrato.restauranteId) {
-    window.open(
-      `/restaurant?restaurant_id=${currentPrato.restauranteId}`,
-      "_blank"
-    );
-  }
 }
 
 // Eventos de inicialização
