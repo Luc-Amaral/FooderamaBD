@@ -1,0 +1,273 @@
+{% extends 'base.html' %} {% block conteudo %}
+<div class="flex flex-col py-2 lg:px-[33rem]">
+  <div class="mt-10 flex flex-col gap-6 bg-white shadow-lg rounded-lg p-6">
+    <div
+      class="flex items-center justify-between border-b border-gray-900/10 pb-4"
+    >
+      <h2 class="text-2xl font-semibold text-gray-900 text-left">
+        Pratos de {{ tipo }}
+      </h2>
+      <a
+        href="/index"
+        class="text-orange-500 hover:text-orange-600 font-medium"
+      >
+        ← Voltar ao início
+      </a>
+    </div>
+
+    {% if pratos %}
+    <p class="text-gray-600">{{ pratos|length }} prato(s) encontrado(s)</p>
+
+    {% for prato in pratos %}
+    <div
+      class="group flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300"
+    >
+      <div class="w-32 h-32 overflow-hidden rounded-2xl bg-gray-200">
+        <img
+          src="../static/images/fooderama.png"
+          alt="Prato"
+          class="h-full w-full object-cover object-center group-hover:opacity-75"
+        />
+      </div>
+      <div class="ml-4 flex flex-col items-start text-sm flex-grow">
+        <div class="mt-2">
+          <p class="font-semibold text-lg">{{ prato.Nome }}</p>
+          <p class="text-sm text-gray-500 mb-1">{{ prato.NomeRestaurante }}</p>
+          <p class="text-gray-600 mb-2">{{ prato.Descricao }}</p>
+          <div class="flex items-center justify-between w-full">
+            <span class="text-orange-500 font-bold text-lg"
+              >R$ {{ "%.2f"|format(prato.Preco) }}</span
+            >
+            <span class="text-gray-500 text-sm"
+              >Estoque: {{ prato.Estoque }}</span
+            >
+          </div>
+        </div>
+      </div>
+      {% if current_user.is_client %}
+      <div class="ml-4">
+        <button
+          onclick="adicionarAoCarrinho('{{ prato.ID_Prato }}', '{{ prato.ID_Restaurante }}', '{{ prato.Nome }}', {{ prato.Preco }})"
+          class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+        >
+          Adicionar
+        </button>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %} {% else %}
+    <div class="text-center py-12">
+      <p class="text-gray-600 text-lg">
+        Nenhum prato de {{ tipo }} está disponível no momento.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if current_user.is_client %}
+  <!-- Botão flutuante do carrinho -->
+  <button
+    id="cart-button"
+    onclick="abrirCheckout()"
+    class="fixed bottom-6 right-6 bg-orange-500 hover:bg-orange-600 text-white p-4 rounded-full shadow-lg z-50 hidden transition-all"
+  >
+    🛒 <span id="cart-count">0</span>
+  </button>
+  {% endif %}
+</div>
+
+{% if current_user.is_client %}
+<!-- Modal para finalizar compra -->
+<div
+  id="checkout-modal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+>
+  <div
+    class="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto"
+  >
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Carrinho</h2>
+      <button
+        onclick="fecharCheckout()"
+        class="text-gray-500 hover:text-gray-700 text-2xl"
+      >
+        &times;
+      </button>
+    </div>
+
+    <form id="checkout-form" action="/finalizar_compra" method="POST">
+      <div id="cart-items" class="mb-4"></div>
+
+      <div class="mb-4">
+        <label
+          for="endereco"
+          class="block text-sm font-medium text-gray-700 mb-2"
+          >Endereço de Entrega:</label
+        >
+        <select
+          id="endereco"
+          name="endereco"
+          required
+          class="w-full border border-gray-300 rounded-md px-3 py-2"
+        >
+          <option value="">Selecione um endereço</option>
+          {% for endereco in enderecos %}
+          <option value="{{ endereco.ID_Endereco }}">
+            {{ endereco.Rua }}, {{ endereco.Numero }} - {{ endereco.Bairro }},
+            {{ endereco.Cidade }} - {{ endereco.CEP }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div
+        id="total-value"
+        class="text-center text-lg font-bold text-orange-500 mb-4"
+      ></div>
+
+      <button
+        type="submit"
+        class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium"
+      >
+        Confirmar Pedido
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Carrinho
+  let cart = [];
+  let currentRestaurantId = null;
+
+  function adicionarAoCarrinho(pratoId, restauranteId, nome, preco) {
+    // Verificar se é do mesmo restaurante
+    if (currentRestaurantId && currentRestaurantId !== restauranteId) {
+      if (
+        !confirm(
+          "Você já tem itens de outro restaurante no carrinho. Deseja limpar o carrinho e adicionar este item?"
+        )
+      ) {
+        return;
+      }
+      cart = [];
+    }
+
+    currentRestaurantId = restauranteId;
+
+    // Verificar se o item já está no carrinho
+    const existingItem = cart.find((item) => item.id === pratoId);
+
+    if (existingItem) {
+      existingItem.quantidade += 1;
+    } else {
+      cart.push({
+        id: pratoId,
+        nome: nome,
+        preco: preco,
+        quantidade: 1,
+      });
+    }
+
+    atualizarCarrinho();
+    mostrarBotaoCarrinho();
+    alert("Item adicionado ao carrinho!");
+  }
+
+  function atualizarCarrinho() {
+    const cartItemsDiv = document.getElementById("cart-items");
+    const totalDiv = document.getElementById("total-value");
+    const cartCountSpan = document.getElementById("cart-count");
+
+    // Atualizar contador do botão
+    const totalItems = cart.reduce((sum, item) => sum + item.quantidade, 0);
+    cartCountSpan.textContent = totalItems;
+
+    if (cart.length === 0) {
+      cartItemsDiv.innerHTML = '<p class="text-gray-500">Carrinho vazio</p>';
+      totalDiv.innerHTML = "";
+      document.getElementById("cart-button").classList.add("hidden");
+      return;
+    }
+
+    let html = "";
+    let total = 0;
+
+    cart.forEach((item, index) => {
+      const subtotal = item.preco * item.quantidade;
+      total += subtotal;
+
+      html += `
+            <div class="flex justify-between items-center py-2 border-b">
+                <div class="flex-grow">
+                    <p class="font-medium">${item.nome}</p>
+                    <p class="text-sm text-gray-500">R$ ${item.preco.toFixed(
+                      2
+                    )} cada</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="alterarQuantidade(${index}, -1)" class="bg-gray-200 px-2 py-1 rounded">-</button>
+                    <span class="px-2">${item.quantidade}</span>
+                    <button type="button" onclick="alterarQuantidade(${index}, 1)" class="bg-gray-200 px-2 py-1 rounded">+</button>
+                    <button type="button" onclick="removerItem(${index})" class="bg-red-500 text-white px-2 py-1 rounded ml-2">×</button>
+                </div>
+            </div>
+        `;
+    });
+
+    // Adicionar campos hidden para envio
+    cart.forEach((item) => {
+      html += `<input type="hidden" name="items[]" value="${item.id}">`;
+      html += `<input type="hidden" name="quantities[]" value="${item.quantidade}">`;
+    });
+
+    cartItemsDiv.innerHTML = html;
+    totalDiv.innerHTML = `Total: R$ ${total.toFixed(2)}`;
+  }
+
+  function alterarQuantidade(index, delta) {
+    cart[index].quantidade += delta;
+    if (cart[index].quantidade <= 0) {
+      cart.splice(index, 1);
+    }
+    if (cart.length === 0) {
+      currentRestaurantId = null;
+    }
+    atualizarCarrinho();
+  }
+
+  function removerItem(index) {
+    cart.splice(index, 1);
+    if (cart.length === 0) {
+      currentRestaurantId = null;
+    }
+    atualizarCarrinho();
+  }
+
+  function mostrarBotaoCarrinho() {
+    document.getElementById("cart-button").classList.remove("hidden");
+  }
+
+  function abrirCheckout() {
+    if (cart.length === 0) {
+      alert("Carrinho vazio!");
+      return;
+    }
+    document.getElementById("checkout-modal").classList.remove("hidden");
+  }
+
+  function fecharCheckout() {
+    document.getElementById("checkout-modal").classList.add("hidden");
+  }
+
+  // Fechar modal clicando fora
+  document
+    .getElementById("checkout-modal")
+    .addEventListener("click", function (e) {
+      if (e.target === this) {
+        fecharCheckout();
+      }
+    });
+</script>
+
+{% endblock %}

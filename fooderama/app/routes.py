@@ -32,13 +32,10 @@ class Cliente(UserMixin):
         return True
     
 class Restaurante(UserMixin):
-    def __init__(self, id_restaurante, id_endereco, nome_restaurante, tipo_culinaria, hora_abertura, hora_fechamento, email, senha, telefone):
+    def __init__(self, id_restaurante, id_endereco, nome_restaurante, email, senha, telefone):
         self.id = id_restaurante
         self.id_endereco = id_endereco
         self.nome_restaurante = nome_restaurante
-        self.tipo_culinaria = tipo_culinaria
-        self.hora_abertura = hora_abertura
-        self.hora_fechamento = hora_fechamento
         self.email = email
         self.senha_hash = senha
         self.telefone = telefone
@@ -88,9 +85,6 @@ def setup_routes(app):
                     id_restaurante=row['ID_Restaurante'],
                     id_endereco=row['ID_Endereco_FK'],
                     nome_restaurante=row['NomeRestaurante'],
-                    tipo_culinaria=row['TipoCulinaria'],
-                    hora_abertura=row['HoraAbertura'],
-                    hora_fechamento=row['HoraFechamento'],
                     email=row['Email'],
                     senha=row['Senha'],  # Não gere hash novamente ao carregar do banco
                     telefone=row['Telefone']
@@ -149,9 +143,6 @@ def setup_routes(app):
                     id_restaurante=row['ID_Restaurante'],
                     id_endereco=row['ID_Endereco_FK'],
                     nome_restaurante=row['NomeRestaurante'],
-                    tipo_culinaria=row['TipoCulinaria'],
-                    hora_abertura=row['HoraAbertura'],
-                    hora_fechamento=row['HoraFechamento'],
                     email=row['Email'],
                     senha=row['Senha'],  # Não gere hash novamente ao carregar do banco
                     telefone=row['Telefone']
@@ -302,22 +293,33 @@ def setup_routes(app):
         if request.method == 'POST':
             # Tratamento para dados enviados via formulário
             nome_restaurante = request.form['name-restaurant']
-            tipo_culinaria = request.form['type-food']
-            hora_abertura = request.form['opening-time']
-            hora_fechamento = request.form['closing-time']
             email = request.form['email']
             senha = generate_password_hash(request.form['password'])
             telefone = request.form['phone']
-
-            # Garantir que o horário esteja no formato XX:XX
-            hora_abertura = format_time(hora_abertura)
-            hora_fechamento = format_time(hora_fechamento)
 
             # Dados do endereço
             rua = request.form['street']
             bairro = request.form['neighborhood']
             numero = request.form['number']
             cep = request.form['cep']
+
+            # Dados dos horários de funcionamento
+            dias_semana = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo']
+            dias_semana_db = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+            
+            horarios = []
+            for i, dia in enumerate(dias_semana):
+                ativo = request.form.get(f'{dia}_ativo') == 'on'
+                if ativo:
+                    abertura = request.form.get(f'{dia}_abertura')
+                    fechamento = request.form.get(f'{dia}_fechamento')
+                    if abertura and fechamento:
+                        horarios.append({
+                            'dia': dias_semana_db[i],
+                            'abertura': format_time(abertura),
+                            'fechamento': format_time(fechamento),
+                            'status': 1
+                        })
 
             # Conexão com o banco de dados
             conn = get_db_connection()
@@ -342,15 +344,22 @@ def setup_routes(app):
                     INSERT INTO endereco (ID_Endereco, Rua, Numero, Bairro, CEP)
                     VALUES (%s, %s, %s, %s, %s)
                 """, (id_endereco, rua, numero, bairro, cep))
-                conn.commit()
 
-                # Insere os dados do restaurante na tabela restaurante
+                # Insere os dados do restaurante na tabela restaurante (sem tipo culinária e horários)
                 cursor.execute("""
-                    INSERT INTO restaurante (ID_Restaurante, ID_Endereco_FK, NomeRestaurante, TipoCulinaria, HoraAbertura, HoraFechamento, Email, Senha, Telefone)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (id_restaurante, id_endereco, nome_restaurante, tipo_culinaria, hora_abertura, hora_fechamento, email, senha, telefone))
-                conn.commit()
+                    INSERT INTO restaurante (ID_Restaurante, ID_Endereco_FK, NomeRestaurante, Email, Senha, Telefone)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (id_restaurante, id_endereco, nome_restaurante, email, senha, telefone))
 
+                # Insere os horários de funcionamento na tabela horafuncionamento
+                for horario in horarios:
+                    id_hora_funcionamento = str(uuid.uuid4())
+                    cursor.execute("""
+                        INSERT INTO horafuncionamento (ID_HoraFuncionamento, ID_Restaurante_FK, DiaSemana, HoraAbertura, HoraFechamento, Status)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """, (id_hora_funcionamento, id_restaurante, horario['dia'], horario['abertura'], horario['fechamento'], horario['status']))
+
+                conn.commit()
                 flash('Restaurante registrado com sucesso!', 'success')
             except Exception as e:
                 conn.rollback()
@@ -395,8 +404,19 @@ def setup_routes(app):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # Busca todos os restaurantes
-        cursor.execute("SELECT * FROM restaurante")
+        # Busca restaurantes que tenham pratos do tipo selecionado
+        if food_type:
+            cursor.execute("""
+                SELECT DISTINCT r.*, tp.Tipo as TipoComida
+                FROM restaurante r
+                JOIN prato p ON r.ID_Restaurante = p.ID_Restaurante_FK
+                JOIN tipo_prato tp ON p.ID_TipoPrato_FK = tp.ID_TipoPrato
+                WHERE LOWER(tp.Tipo) = %s
+            """, (food_type,))
+        else:
+            # Se não há filtro, busca todos os restaurantes
+            cursor.execute("SELECT *, NULL as TipoComida FROM restaurante")
+        
         restaurantes = cursor.fetchall()
         
         # Dicionário para armazenar as médias das avaliações

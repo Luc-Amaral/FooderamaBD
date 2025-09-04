@@ -206,7 +206,6 @@ CREATE TABLE `restaurante` (
   `ID_Restaurante` char(36) NOT NULL,
   `ID_Endereco_FK` char(36) NOT NULL,
   `NomeRestaurante` varchar(100) NOT NULL,
-  `TipoCulinaria` varchar(50) NOT NULL,
   `Email` varchar(40) NOT NULL,
   `Senha` varchar(255) NOT NULL,
   `Telefone` bigint NOT NULL,
