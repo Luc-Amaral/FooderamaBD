@@ -307,23 +307,41 @@
 
 <script>
   function toggleCartaoFields() {
+    console.log("toggleCartaoFields chamada!");
+
     const cartaoFields = document.getElementById("cartaoFields");
     const numeroCartao = document.getElementById("numero_cartao");
     const nomePortador = document.getElementById("nome_portador");
     const dataVencimento = document.getElementById("data_vencimento");
     const cvv = document.getElementById("cvv");
 
-    const selectedValue = document.querySelector(
+    console.log("cartaoFields encontrado:", cartaoFields);
+
+    const selectedRadio = document.querySelector(
       'input[name="tipo_metodo"]:checked'
-    ).value;
+    );
+
+    console.log("selectedRadio:", selectedRadio);
+
+    if (!selectedRadio) {
+      // Se nenhum radio button estiver selecionado, ocultar campos do cartão
+      console.log("Nenhum radio selecionado - ocultando campos");
+      cartaoFields.classList.add("hidden");
+      return;
+    }
+
+    const selectedValue = selectedRadio.value;
+    console.log("selectedValue:", selectedValue);
 
     if (selectedValue === "Debito" || selectedValue === "Credito") {
+      console.log("Mostrando campos do cartão");
       cartaoFields.classList.remove("hidden");
       numeroCartao.required = true;
       nomePortador.required = true;
       dataVencimento.required = true;
       cvv.required = true;
     } else {
+      console.log("Ocultando campos do cartão");
       cartaoFields.classList.add("hidden");
       numeroCartao.required = false;
       nomePortador.required = false;
@@ -362,6 +380,52 @@
 
     input.value = value;
   }
+
+  // Validação do formulário antes do envio
+  document
+    .getElementById("pagamentoForm")
+    .addEventListener("submit", function (e) {
+      const selectedRadio = document.querySelector(
+        'input[name="tipo_metodo"]:checked'
+      );
+
+      if (!selectedRadio) {
+        e.preventDefault();
+        alert("Por favor, selecione um tipo de método de pagamento.");
+        return false;
+      }
+
+      const selectedValue = selectedRadio.value;
+
+      if (selectedValue === "Debito" || selectedValue === "Credito") {
+        const numeroCartao = document
+          .getElementById("numero_cartao")
+          .value.trim();
+        const nomePortador = document
+          .getElementById("nome_portador")
+          .value.trim();
+        const dataVencimento = document
+          .getElementById("data_vencimento")
+          .value.trim();
+        const cvv = document.getElementById("cvv").value.trim();
+
+        if (!numeroCartao || !nomePortador || !dataVencimento || !cvv) {
+          e.preventDefault();
+          alert("Por favor, preencha todos os campos do cartão.");
+          return false;
+        }
+
+        // Validar formato da data MM/AA
+        const datePattern = /^\d{2}\/\d{2}$/;
+        if (!datePattern.test(dataVencimento)) {
+          e.preventDefault();
+          alert("Por favor, digite a data de vencimento no formato MM/AA.");
+          return false;
+        }
+      }
+
+      return true;
+    });
 </script>
 
 {% endblock %}

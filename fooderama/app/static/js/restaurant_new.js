@@ -3,6 +3,7 @@ let cart = [];
 let currentRestaurantId = null;
 let enderecos = [];
 let currentPrato = null;
+let selectedPaymentMethod = null;
 
 // Carregar endereços do usuário
 async function carregarEnderecos() {
@@ -20,6 +21,95 @@ async function carregarEnderecos() {
     }
   } catch (error) {
     console.error("Erro ao carregar endereços:", error);
+  }
+}
+
+// Carregar métodos de pagamento do usuário
+async function carregarMetodosPagamento() {
+  try {
+    console.log("Iniciando carregamento de métodos de pagamento...");
+    const response = await fetch("/api/metodos_pagamento");
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const metodos = await response.json();
+    console.log("Métodos de pagamento recebidos:", metodos);
+
+    const paymentMethodsDiv = document.getElementById("payment-methods");
+    if (paymentMethodsDiv) {
+      paymentMethodsDiv.innerHTML = "";
+
+      if (metodos.length === 0) {
+        console.log("Nenhum método de pagamento encontrado");
+        paymentMethodsDiv.innerHTML = `
+          <div class="text-center text-gray-500 text-sm py-2">
+            Nenhum método de pagamento cadastrado
+          </div>
+        `;
+      } else {
+        console.log("Renderizando", metodos.length, "métodos de pagamento");
+        metodos.forEach((metodo) => {
+          let displayText = "";
+          let icon = "";
+
+          console.log("Processando método:", metodo);
+
+          if (metodo.TipoMetodo === "PIX") {
+            displayText = "PIX";
+            icon = "�";
+          } else if (
+            metodo.TipoMetodo === "Débito" ||
+            metodo.TipoMetodo === "Debito"
+          ) {
+            const ultimosDigitos = metodo.NumeroCartao
+              ? metodo.NumeroCartao.slice(-4)
+              : "****";
+            displayText = `Cartão de Débito **** ${ultimosDigitos}`;
+            if (metodo.NomePortador) {
+              displayText += ` - ${metodo.NomePortador}`;
+            }
+            icon = "💳";
+          } else if (
+            metodo.TipoMetodo === "Crédito" ||
+            metodo.TipoMetodo === "Credito"
+          ) {
+            const ultimosDigitos = metodo.NumeroCartao
+              ? metodo.NumeroCartao.slice(-4)
+              : "****";
+            displayText = `Cartão de Crédito **** ${ultimosDigitos}`;
+            if (metodo.NomePortador) {
+              displayText += ` - ${metodo.NomePortador}`;
+            }
+            icon = "💳";
+          } else {
+            displayText = metodo.TipoMetodo || "Método não identificado";
+            icon = "❓";
+          }
+
+          console.log("Display text:", displayText);
+
+          paymentMethodsDiv.innerHTML += `
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+              <input 
+                type="radio" 
+                name="payment-method" 
+                value="${metodo.ID_MetodoPagamento}" 
+                onchange="selecionarMetodoPagamento(${metodo.ID_MetodoPagamento}, '${metodo.TipoMetodo}')"
+                class="mr-3"
+              />
+              <span class="mr-2">${icon}</span>
+              <span>${displayText}</span>
+            </label>
+          `;
+        });
+      }
+    } else {
+      console.error("Elemento payment-methods não encontrado");
+    }
+  } catch (error) {
+    console.error("Erro ao carregar métodos de pagamento:", error);
   }
 }
 
@@ -167,6 +257,9 @@ function abrirCheckout() {
     return;
   }
 
+  // Carregar métodos de pagamento
+  carregarMetodosPagamento();
+
   // Mostrar itens do carrinho
   const cartItemsDiv = document.getElementById("cart-items");
   cartItemsDiv.innerHTML = "";
@@ -198,6 +291,11 @@ function abrirCheckout() {
   document.getElementById(
     "total-value"
   ).textContent = `Total: R$ ${total.toFixed(2)}`;
+
+  // Reset payment method selection
+  selectedPaymentMethod = null;
+  atualizarBotaoConfirmar();
+
   document.getElementById("checkout-modal").classList.remove("hidden");
 }
 
@@ -225,14 +323,47 @@ function finalizarPedido() {
     return;
   }
 
+  if (!selectedPaymentMethod) {
+    alert("Selecione um método de pagamento!");
+    return;
+  }
+
   // Simular finalização do pedido
   alert("Pedido confirmado! Em breve você receberá a confirmação.");
 
   // Limpar carrinho
   cart = [];
   currentRestaurantId = null;
+  selectedPaymentMethod = null;
   atualizarCarrinho();
   fecharCheckout();
+}
+
+// Selecionar método de pagamento
+function selecionarMetodoPagamento(id, tipo) {
+  selectedPaymentMethod = { id: id, tipo: tipo };
+  atualizarBotaoConfirmar();
+}
+
+// Atualizar estado do botão confirmar
+function atualizarBotaoConfirmar() {
+  const confirmBtn = document.getElementById("confirm-order-btn");
+  if (selectedPaymentMethod) {
+    confirmBtn.disabled = false;
+    confirmBtn.className =
+      "w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium";
+    confirmBtn.textContent = "Confirmar Pedido";
+  } else {
+    confirmBtn.disabled = true;
+    confirmBtn.className =
+      "w-full bg-gray-400 cursor-not-allowed text-white py-3 rounded-lg font-medium";
+    confirmBtn.textContent = "Selecione um método de pagamento";
+  }
+}
+
+// Abrir cadastro de pagamento em nova aba
+function abrirCadastroPagamento() {
+  window.open("/cadastrar_pagamento", "_blank");
 }
 
 // Adicionar novo endereço - abre em nova aba para não perder o pedido

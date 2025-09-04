@@ -783,7 +783,16 @@ def setup_routes(app):
     @login_required
     def cadastrar_pagamento():
         if request.method == 'POST':
+            # Verificar se o campo tipo_metodo está presente
+            if 'tipo_metodo' not in request.form:
+                flash('Selecione um tipo de método de pagamento.', 'error')
+                return redirect('/cadastrar_pagamento')
+                
             tipo_metodo = request.form['tipo_metodo']
+            
+            if not tipo_metodo:
+                flash('Selecione um tipo de método de pagamento.', 'error')
+                return redirect('/cadastrar_pagamento')
             
             conn = get_db_connection()
             cursor = conn.cursor()
