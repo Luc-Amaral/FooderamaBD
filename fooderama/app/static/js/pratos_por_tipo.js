@@ -239,7 +239,7 @@ function finalizarPedido() {
 
 // Adicionar novo endereço - abre em nova aba para não perder o pedido
 function adicionarEndereco() {
-  window.open('/cadastrar_endereco', '_blank');
+  window.open("/cadastrar_endereco", "_blank");
 }
 
 // Eventos de inicialização
