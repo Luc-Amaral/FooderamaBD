@@ -779,6 +779,100 @@ def setup_routes(app):
 
         return render_template('cadastrar_endereco.html', addresses=addresses)
     
+    @app.route('/cadastrar_pagamento', methods=['GET', 'POST'])
+    @login_required
+    def cadastrar_pagamento():
+        if request.method == 'POST':
+            tipo_metodo = request.form['tipo_metodo']
+            
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            try:
+                id_metodo_pagamento = str(uuid.uuid4())
+
+                # Inserir método de pagamento
+                cursor.execute("""
+                    INSERT INTO metodo_pagamento (ID_MetodoPagamento, ID_Cliente_FK, TipoMetodo)
+                    VALUES (%s, %s, %s)
+                """, (id_metodo_pagamento, current_user.id, tipo_metodo))
+                conn.commit()
+
+                # Se for cartão (Débito ou Crédito), inserir dados do cartão
+                if tipo_metodo in ['Debito', 'Credito']:
+                    numero_cartao = request.form['numero_cartao'].replace(' ', '')  # Remove espaços
+                    nome_portador = request.form['nome_portador']
+                    data_vencimento_raw = request.form['data_vencimento']
+                    cvv = request.form['cvv']
+                    
+                    # Converter data de MM/AA para YYYY-MM-DD
+                    if '/' in data_vencimento_raw and len(data_vencimento_raw) == 5:
+                        mes, ano = data_vencimento_raw.split('/')
+                        # Assumir século 20XX se ano for menor que 50, senão 19XX
+                        ano_completo = f"20{ano}" if int(ano) < 50 else f"19{ano}"
+                        # Usar o último dia do mês
+                        import calendar
+                        ultimo_dia = calendar.monthrange(int(ano_completo), int(mes))[1]
+                        data_vencimento = f"{ano_completo}-{mes.zfill(2)}-{ultimo_dia:02d}"
+                    else:
+                        data_vencimento = data_vencimento_raw
+
+                    id_cartao = str(uuid.uuid4())
+
+                    cursor.execute("""
+                        INSERT INTO cartao (ID_Cartao, ID_MetodoPagamento_FK, NumeroCartao, NomePortador, DataVencimento, CVV, TipoCartao)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    """, (id_cartao, id_metodo_pagamento, numero_cartao, nome_portador, data_vencimento, cvv, tipo_metodo))
+                    conn.commit()
+
+                flash('Método de pagamento cadastrado com sucesso!', 'success')
+
+            except Exception as e:
+                conn.rollback()
+                print(f"Erro ao cadastrar método de pagamento: {e}")  # Debug
+                flash('Erro ao cadastrar método de pagamento. Verifique os dados informados.', 'danger')
+            finally:
+                cursor.close()
+                conn.close()
+
+            return redirect(url_for('cadastrar_pagamento'))
+
+        # Buscar métodos de pagamento do usuário
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT mp.ID_MetodoPagamento, mp.TipoMetodo,
+                   c.NumeroCartao, c.NomePortador, c.DataVencimento
+            FROM metodo_pagamento mp
+            LEFT JOIN cartao c ON mp.ID_MetodoPagamento = c.ID_MetodoPagamento_FK
+            WHERE mp.ID_Cliente_FK = %s
+            ORDER BY mp.TipoMetodo
+        """, (current_user.id,))
+        metodos_pagamento = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return render_template('cadastrar_pagamento.html', metodos_pagamento=metodos_pagamento)
+
+    @app.route('/api/metodos_pagamento')
+    @login_required
+    def api_metodos_pagamento():
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT mp.ID_MetodoPagamento, mp.TipoMetodo,
+                   c.NumeroCartao, c.NomePortador
+            FROM metodo_pagamento mp
+            LEFT JOIN cartao c ON mp.ID_MetodoPagamento = c.ID_MetodoPagamento_FK
+            WHERE mp.ID_Cliente_FK = %s
+            ORDER BY mp.TipoMetodo
+        """, (current_user.id,))
+        metodos = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return jsonify(metodos)
+    
 
     @app.route('/aceitar_pedido/<pedido_id>', methods=['POST'])
     @login_required

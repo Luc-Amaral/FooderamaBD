@@ -56,7 +56,7 @@ function abrirModalPrato(
   document.getElementById("prato-modal").classList.remove("hidden");
 }
 
-// Fechar modal do prato bunda
+// Fechar modal do prato
 function fecharModalPrato() {
   document.getElementById("prato-modal").classList.add("hidden");
   currentPrato = null;
