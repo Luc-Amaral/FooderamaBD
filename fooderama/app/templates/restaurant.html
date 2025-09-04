@@ -1,77 +1,103 @@
-{% extends 'base.html' %}
-{% block conteudo %}
+{% extends 'base.html' %} {% block conteudo %}
 
 <div class="sm:mx-auto sm:w-2/4 pt-12">
-    <img src="../static/images/cozinha-bg.png" class="rounded-md">
+  <img src="../static/images/cozinha-bg.png" class="rounded-md" />
 </div>
 <div class="flex min-h-full flex-col justify-center items-center px-6 py-4">
-    <div class="sm:w-[101.1vh] bg-white shadow-lg rounded-lg p-6">
-        <div class="flex justify-between items-center gap-x-3 h-full pt-6 border-b border-gray-900/10 pb-4">
-            <h2 class="text-start text-3xl font-bold tracking-tight text-gray-900">{{ restaurante.NomeRestaurante }}
-            </h2>
-            <div class="flex items-center gap-2">
-                <a href="/feedback?restaurant_id={{ restaurante.ID_Restaurante }}"
-                    class="text-sm font-semibold bg-black text-[#D2FF5A] rounded-md px-3.5 py-1.5 hover:bg-gray-800 active:bg-[#D2FF5A] active:text-black transition-colors duration-100">
-                    Avaliações da Loja
-                </a>
-            </div>
-        </div>
-        <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-            <!-- Produtos com popup -->
-            {% for prato in pratos %}
-            {% if prato.StatusDisponibilidade == 1 %}
-            <!-- Card do prato disponível -->
-            <button 
-                onclick="abrirModalPrato('{{ prato.ID_Prato }}', '{{ restaurante.ID_Restaurante }}', '{{ prato.Nome }}', '{{ prato.Descricao }}', {{ prato.Preco }}, {{ prato.Estoque }}, '{{ restaurante.NomeRestaurante }}')"
-                class="flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300"
-                type="button">
-                <div class="w-32 h-32 overflow-hidden rounded-2xl bg-gray-200">
-                    <img src="../static/images/tipos_comida/{{ food_type }}.png" alt="{{ food_type }}"
-                        class="h-full w-full object-cover object-center group-hover:opacity-75">
-                </div>
-                <div class="ml-4 flex flex-col items-start text-sm w-3/5 max-w-full overflow-hidden">
-                    <p class="text-xl">{{ prato.Nome }}</p>
-                    <p class="text-gray-500 line-clamp-2 text-left overflow-hidden">{{ prato.Descricao }}</p>
-                    <div class="flex justify-between w-full pt-2">
-                        <div class="text-sm text-gray-400">Estoque: {{ prato.Estoque }}</div>
-                        <p class="text-end flex items-end font-bold text-base"><span>R$</span>{{
-                            '%.2f'|format(prato.Preco) }}</p>
-                    </div>
-                </div>
-            </button>
-            {% endif %}
-            {% if prato.StatusDisponibilidade == 0 and current_user.id_endereco == restaurante.ID_Endereco_FK %}
-            <!-- Card do prato indisponível -->
-            <div class="flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 opacity-50 cursor-not-allowed">
-                <div class="w-32 h-32 overflow-hidden rounded-2xl bg-gray-200">
-                    <img src="../static/images/tipos_comida/{{ food_type }}.png" alt="{{ food_type }}"
-                        class="h-full w-full object-cover object-center filter grayscale">
-                </div>
-                <div class="ml-4 flex flex-col items-start text-sm w-3/5 max-w-full overflow-hidden">
-                    <p class="text-xl">{{ prato.Nome }}</p>
-                    <p class="text-gray-500 line-clamp-2 text-left overflow-hidden">{{ prato.Descricao }}</p>
-                    <div class="flex justify-between w-full pt-2">
-                        <div class="text-red-500">Indisponível</div>
-                        <p class="text-end flex items-end font-bold text-base"><span>R$</span>{{
-                            '%.2f'|format(prato.Preco) }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-        </div>
+  <div class="sm:w-[101.1vh] bg-white shadow-lg rounded-lg p-6">
+    <div
+      class="flex justify-between items-center gap-x-3 h-full pt-6 border-b border-gray-900/10 pb-4"
+    >
+      <h2 class="text-start text-3xl font-bold tracking-tight text-gray-900">
+        {{ restaurante.NomeRestaurante }}
+      </h2>
+      <div class="flex items-center gap-2">
+        <a
+          href="/feedback?restaurant_id={{ restaurante.ID_Restaurante }}"
+          class="text-sm font-semibold bg-black text-[#D2FF5A] rounded-md px-3.5 py-1.5 hover:bg-gray-800 active:bg-[#D2FF5A] active:text-black transition-colors duration-100"
+        >
+          Avaliações da Loja
+        </a>
+      </div>
     </div>
+    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <!-- Produtos com popup -->
+      {% for prato in pratos %} {% if prato.StatusDisponibilidade == 1 %}
+      <!-- Card do prato disponível -->
+      <button
+        onclick="abrirModalPrato('{{ prato.ID_Prato }}', '{{ restaurante.ID_Restaurante }}', '{{ prato.Nome }}', '{{ prato.Descricao }}', {{ prato.Preco }}, {{ prato.Estoque }}, '{{ restaurante.NomeRestaurante }}')"
+        class="flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300"
+        type="button"
+      >
+        <div class="w-32 h-32 overflow-hidden rounded-2xl bg-gray-200">
+          <img
+            src="../static/images/tipos_comida/{{ food_type }}.png"
+            alt="{{ food_type }}"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
+        </div>
+        <div
+          class="ml-4 flex flex-col items-start text-sm w-3/5 max-w-full overflow-hidden"
+        >
+          <p class="text-xl">{{ prato.Nome }}</p>
+          <p class="text-gray-500 line-clamp-2 text-left overflow-hidden">
+            {{ prato.Descricao }}
+          </p>
+          <div class="flex justify-between w-full pt-2">
+            <div class="text-sm text-gray-400">
+              Estoque: {{ prato.Estoque }}
+            </div>
+            <p class="text-end flex items-end font-bold text-base">
+              <span>R$</span>{{ '%.2f'|format(prato.Preco) }}
+            </p>
+          </div>
+        </div>
+      </button>
+      {% endif %} {% if prato.StatusDisponibilidade == 0 and
+      current_user.id_endereco == restaurante.ID_Endereco_FK %}
+      <!-- Card do prato indisponível -->
+      <div
+        class="flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 opacity-50 cursor-not-allowed"
+      >
+        <div class="w-32 h-32 overflow-hidden rounded-2xl bg-gray-200">
+          <img
+            src="../static/images/tipos_comida/{{ food_type }}.png"
+            alt="{{ food_type }}"
+            class="h-full w-full object-cover object-center filter grayscale"
+          />
+        </div>
+        <div
+          class="ml-4 flex flex-col items-start text-sm w-3/5 max-w-full overflow-hidden"
+        >
+          <p class="text-xl">{{ prato.Nome }}</p>
+          <p class="text-gray-500 line-clamp-2 text-left overflow-hidden">
+            {{ prato.Descricao }}
+          </p>
+          <div class="flex justify-between w-full pt-2">
+            <div class="text-red-500">Indisponível</div>
+            <p class="text-end flex items-end font-bold text-base">
+              <span>R$</span>{{ '%.2f'|format(prato.Preco) }}
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endif %} {% endfor %}
+    </div>
+  </div>
 </div>
 
 <!-- Botão do carrinho flutuante -->
 <div id="cart-button" class="fixed bottom-5 right-5 z-40 hidden">
-  <button 
-    onclick="abrirCheckout()" 
+  <button
+    onclick="abrirCheckout()"
     class="bg-orange-500 hover:bg-orange-600 text-white rounded-full p-3 shadow-lg flex items-center gap-2"
   >
-    <img src="../static/images/carrinho.svg" alt="Carrinho" class="w-6 h-6">
-    <span id="cart-count" class="bg-white text-orange-500 rounded-full px-2 py-1 text-sm font-bold">0</span>
+    <img src="../static/images/carrinho.svg" alt="Carrinho" class="w-6 h-6" />
+    <span
+      id="cart-count"
+      class="bg-white text-orange-500 rounded-full px-2 py-1 text-sm font-bold"
+      >0</span
+    >
   </button>
 </div>
 
@@ -221,6 +247,4 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/restaurant_new.js') }}"></script>
-{% endif %}
-
-{% endblock %}
+{% endif %} {% endblock %}

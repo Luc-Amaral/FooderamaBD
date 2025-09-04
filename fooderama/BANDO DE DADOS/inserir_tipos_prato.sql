@@ -14,3 +14,4 @@ INSERT INTO tipo_prato (ID_TipoPrato, Tipo) VALUES
 ('0j1k2l3m-4n5o-6p7q-8r9s-0t1u2v3w4x5y', 'Pizza'),
 ('1k2l3m4n-5o6p-7q8r-9s0t-1u2v3w4x5y6z', 'Sorvete'),
 ('2l3m4n5o-6p7q-8r9s-0t1u-2v3w4x5y6z7a', 'Vegetariana');
+
