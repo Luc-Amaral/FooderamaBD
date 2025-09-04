@@ -503,18 +503,24 @@ def setup_routes(app):
         cursor.execute("SELECT * FROM restaurante WHERE ID_Restaurante = %s", (current_user.id,))
         restaurante = cursor.fetchone()
 
+        # Buscar todos os tipos de prato disponíveis
+        cursor.execute("SELECT * FROM tipo_prato ORDER BY Tipo")
+        tipos_prato = cursor.fetchall()
+
         cursor.close()
         conn.close()
 
-        return render_template('cadastrar_comida.html', prato=prato, restaurante=restaurante)
+        return render_template('cadastrar_comida.html', prato=prato, restaurante=restaurante, tipos_prato=tipos_prato)
     
     @app.route('/submit_food', methods=['POST'])
     @login_required
     def submit_food():
         # Extract form data
         food_name = request.form['food_name']
+        food_type = request.form['food_type']  # ID do tipo de prato
         description = request.form['description']
         price = request.form['price']
+        estoque = request.form['estoque']
         status = request.form['status']
 
         # Convert status to appropriate value
@@ -529,9 +535,9 @@ def setup_routes(app):
 
         try:
             cursor.execute("""
-                INSERT INTO prato (ID_Prato, ID_Restaurante_FK, Nome, Descricao, Preco, StatusDisponibilidade)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (food_id, current_user.id, food_name, description, price, status_value))
+                INSERT INTO prato (ID_Prato, ID_Restaurante_FK, ID_TipoPrato_FK, Nome, Descricao, Preco, Estoque, StatusDisponibilidade)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (food_id, current_user.id, food_type, food_name, description, price, estoque, status_value))
             conn.commit()
             flash('Comida cadastrada com sucesso!', 'success')
         except Exception as e:
@@ -558,11 +564,17 @@ def setup_routes(app):
             flash('Prato não encontrado ou você não tem permissão para editar esse prato.', 'danger')
             return redirect(url_for('cadastrar_comida'))
 
+        # Buscar todos os tipos de prato disponíveis para o formulário
+        cursor.execute("SELECT * FROM tipo_prato ORDER BY Tipo")
+        tipos_prato = cursor.fetchall()
+
         if request.method == 'POST':
             # Obter os novos dados do formulário
             food_name = request.form['food_name']
+            food_type = request.form['food_type']  # ID do tipo de prato
             description = request.form['description']
             price = request.form['price']
+            estoque = request.form['estoque']
             status = request.form['status']
 
             status_value = 1 if status == 'ativo' else 0
@@ -571,9 +583,9 @@ def setup_routes(app):
             try:
                 cursor.execute("""
                     UPDATE prato
-                    SET Nome = %s, Descricao = %s, Preco = %s, StatusDisponibilidade = %s
+                    SET Nome = %s, ID_TipoPrato_FK = %s, Descricao = %s, Preco = %s, Estoque = %s, StatusDisponibilidade = %s
                     WHERE ID_Prato = %s
-                """, (food_name, description, price, status_value, food_id))
+                """, (food_name, food_type, description, price, estoque, status_value, food_id))
                 conn.commit()
                 flash('Comida atualizada com sucesso!', 'success')
             except Exception as e:
@@ -586,7 +598,9 @@ def setup_routes(app):
             return redirect(url_for('cadastrar_comida'))
 
         # Se for GET, exibir o formulário com os dados do prato
-        return render_template('editar_prato.html', food=food)
+        cursor.close()
+        conn.close()
+        return render_template('editar_prato.html', food=food, tipos_prato=tipos_prato)
 
     @app.route('/alterar_status/<prato_id>')
     @login_required

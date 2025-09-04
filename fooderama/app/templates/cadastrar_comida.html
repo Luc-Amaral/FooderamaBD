@@ -1,83 +1,177 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block conteudo %}
+<div
+  class="flex flex-col bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-12"
+>
+  <h2
+    class="text-2xl font-semibold text-gray-900 text-left border-b border-gray-900/10 pb-4"
+  >
+    Cadastrar Comida
+  </h2>
+  <form action="/submit_food" method="POST" class="mt-6 flex flex-col gap-4">
+    <div class="flex flex-col">
+      <label for="food_name" class="block text-sm font-medium text-gray-900"
+        >Nome da Comida</label
+      >
+      <div class="mt-2">
+        <input
+          type="text"
+          id="food_name"
+          name="food_name"
+          placeholder="Nome da Comida"
+          required
+          class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+        />
+      </div>
+    </div>
 
-{% block conteudo %}
-<div class="flex flex-col bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-12">
-    <h2 class="text-2xl font-semibold text-gray-900 text-left border-b border-gray-900/10 pb-4">Cadastrar Comida</h2>
-    <form action="/submit_food" method="POST" class="mt-6 flex flex-col gap-4">
-        <div class="flex flex-col">
-            <label for="food_name" class="block text-sm font-medium text-gray-900">Nome da Comida</label>
-            <div class="mt-2">
-                <input type="text" id="food_name" name="food_name" placeholder="Nome da Comida"
-                    class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm">
-            </div>
-        </div>
+    <div class="flex flex-col">
+      <label for="food_type" class="block text-sm font-medium text-gray-900"
+        >Tipo de Comida</label
+      >
+      <div class="mt-2">
+        <select
+          id="food_type"
+          name="food_type"
+          required
+          class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+        >
+          <option value="">Selecione o tipo de comida</option>
+          {% for tipo in tipos_prato %}
+          <option value="{{ tipo.ID_TipoPrato }}">{{ tipo.Tipo }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
 
-        <div class="flex flex-col">
-            <label for="description" class="block text-sm font-medium text-gray-900">Descrição</label>
-            <div class="mt-2">
-                <textarea id="description" name="description" rows="4" maxlength="300" placeholder="Descrição"
-                    class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"></textarea>
-            </div>
-        </div>
+    <div class="flex flex-col">
+      <label for="description" class="block text-sm font-medium text-gray-900"
+        >Descrição</label
+      >
+      <div class="mt-2">
+        <textarea
+          id="description"
+          name="description"
+          rows="4"
+          maxlength="300"
+          placeholder="Descrição"
+          class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+        ></textarea>
+      </div>
+    </div>
 
-        <div class="flex flex-col">
-            <label for="price" class="block text-sm font-medium text-gray-900">Preço</label>
-            <div class="mt-2 flex items-center">
-                <span class="px-3 text-gray-500">R$</span>
-                <input type="number" id="price" name="price" placeholder="Preço"
-                    class="pl-2 block w-2/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm">
-            </div>
-        </div>
+    <div class="flex flex-col">
+      <label for="price" class="block text-sm font-medium text-gray-900"
+        >Preço</label
+      >
+      <div class="mt-2 flex items-center">
+        <span class="px-3 text-gray-500">R$</span>
+        <input
+          type="number"
+          id="price"
+          name="price"
+          placeholder="Preço"
+          step="0.01"
+          min="0"
+          required
+          class="pl-2 block w-2/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+        />
+      </div>
+    </div>
 
-        <div class="flex flex-col gap-2 mt-4">
-            <label class="block text-sm font-medium text-gray-900">Status de Disponibilidade da Comida</label>
-            <div class="flex items-center gap-4">
-                <label class="flex items-center">
-                    <input type="radio" name="status" value="ativo" class="mr-2" checked>
-                    Ativo
-                </label>
-                <label class="flex items-center">
-                    <input type="radio" name="status" value="inativo" class="mr-2">
-                    Inativo
-                </label>
-            </div>
-        </div>
+    <div class="flex flex-col">
+      <label for="estoque" class="block text-sm font-medium text-gray-900"
+        >Quantidade em Estoque</label
+      >
+      <div class="mt-2">
+        <input
+          type="number"
+          id="estoque"
+          name="estoque"
+          placeholder="Quantidade disponível"
+          min="0"
+          required
+          class="pl-2 block w-2/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+        />
+      </div>
+    </div>
 
-        <button type="submit"
-            class="self-end bg-black text-white px-3 py-2 rounded-md hover:bg-gray-800 transition-colors duration-200 text-sm font-semibold">Cadastrar</button>
-    </form>
+    <div class="flex flex-col gap-2 mt-4">
+      <label class="block text-sm font-medium text-gray-900"
+        >Status de Disponibilidade da Comida</label
+      >
+      <div class="flex items-center gap-4">
+        <label class="flex items-center">
+          <input
+            type="radio"
+            name="status"
+            value="ativo"
+            class="mr-2"
+            checked
+          />
+          Ativo
+        </label>
+        <label class="flex items-center">
+          <input type="radio" name="status" value="inativo" class="mr-2" />
+          Inativo
+        </label>
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      class="self-end bg-black text-white px-3 py-2 rounded-md hover:bg-gray-800 transition-colors duration-200 text-sm font-semibold"
+    >
+      Cadastrar
+    </button>
+  </form>
 </div>
 
-<div class="flex flex-col bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-10 mb-4">
-    <h2 class="text-2xl font-semibold text-gray-900 text-left pb-4">Comidas Cadastradas</h2>
-    <div class="mt-6 flex flex-col gap-4">
-        {% if prato %}
-        {% for food in prato %}
-        <div class="flex flex-col gap-2 border-t">
-            <div class="flex items-center justify-between mt-2">
-                <div class="flex items-center gap-2">
-                    <h3 class="text-lg font-semibold text-gray-900">{{ food.Nome }}</h3>
-                    <span class="text-sm font-medium text-gray-500">R$ {{ '%.2f'|format(food.Preco) }}</span>
-                </div>
-            </div>
-            <p class="text-sm text-gray-600">{{ food.Descricao }}</p>
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-600">Status do Produto: <span
-                        class="text-sm font-medium text-gray-500">{{ food.StatusDisponibilidade }}</span></span>
-                <form action="/alterar_status/{{ food.ID_Prato }}">
-                    <button type="submit"
-                    class="text-sm font-medium text-blue-500 hover:text-blue-700">Alterar Status</button>
-                </form>
-
-                <!-- Botão para editar o prato -->
-                <a href="/editar_prato/{{ food.ID_Prato }}" class="text-sm font-medium text-blue-500 hover:text-blue-700">Editar</a>
-            </div>
+<div
+  class="flex flex-col bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-10 mb-4"
+>
+  <h2 class="text-2xl font-semibold text-gray-900 text-left pb-4">
+    Comidas Cadastradas
+  </h2>
+  <div class="mt-6 flex flex-col gap-4">
+    {% if prato %} {% for food in prato %}
+    <div class="flex flex-col gap-2 border-t">
+      <div class="flex items-center justify-between mt-2">
+        <div class="flex items-center gap-2">
+          <h3 class="text-lg font-semibold text-gray-900">{{ food.Nome }}</h3>
+          <span class="text-sm font-medium text-gray-500"
+            >R$ {{ '%.2f'|format(food.Preco) }}</span
+          >
         </div>
-        {% endfor %}
-        {% else %}
-        <p class="text-sm text-gray-600">Nenhuma comida cadastrada.</p>
-        {% endif %}
+      </div>
+      <p class="text-sm text-gray-600">{{ food.Descricao }}</p>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-gray-600"
+          >Status do Produto:
+          <span class="text-sm font-medium text-gray-500"
+            >{{ food.StatusDisponibilidade }}</span
+          ></span
+        >
+        <form action="/alterar_status/{{ food.ID_Prato }}">
+          <button
+            type="submit"
+            class="text-sm font-medium text-blue-500 hover:text-blue-700"
+          >
+            Alterar Status
+          </button>
+        </form>
+
+        <!-- Botão para editar o prato -->
+        <a
+          href="/editar_prato/{{ food.ID_Prato }}"
+          class="text-sm font-medium text-blue-500 hover:text-blue-700"
+          >Editar</a
+        >
+      </div>
     </div>
+    {% endfor %} {% else %}
+    <p class="text-sm text-gray-600">Nenhuma comida cadastrada.</p>
+    {% endif %}
+  </div>
 </div>
 
 {% endblock %}

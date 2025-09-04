@@ -6,8 +6,21 @@
         <div class="flex flex-col">
             <label for="food_name" class="block text-sm font-medium text-gray-900">Nome da Comida</label>
             <div class="mt-2">
-                <input type="text" id="food_name" name="food_name" value="{{ food.Nome }}"
+                <input type="text" id="food_name" name="food_name" value="{{ food.Nome }}" required
                     class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm">
+            </div>
+        </div>
+
+        <div class="flex flex-col">
+            <label for="food_type" class="block text-sm font-medium text-gray-900">Tipo de Comida</label>
+            <div class="mt-2">
+                <select id="food_type" name="food_type" required
+                    class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm">
+                    <option value="">Selecione o tipo de comida</option>
+                    {% for tipo in tipos_prato %}
+                        <option value="{{ tipo.ID_TipoPrato }}" {% if tipo.ID_TipoPrato == food.ID_TipoPrato_FK %}selected{% endif %}>{{ tipo.Tipo }}</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
 
@@ -23,7 +36,15 @@
             <label for="price" class="block text-sm font-medium text-gray-900">Preço</label>
             <div class="mt-2 flex items-center">
                 <span class="px-3 text-gray-500">R$</span>
-                <input type="number" id="price" name="price" value="{{ food.Preco }}"
+                <input type="number" id="price" name="price" value="{{ food.Preco }}" step="0.01" min="0" required
+                    class="pl-2 block w-2/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm">
+            </div>
+        </div>
+
+        <div class="flex flex-col">
+            <label for="estoque" class="block text-sm font-medium text-gray-900">Quantidade em Estoque</label>
+            <div class="mt-2">
+                <input type="number" id="estoque" name="estoque" value="{{ food.Estoque }}" min="0" required
                     class="pl-2 block w-2/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm">
             </div>
         </div>
