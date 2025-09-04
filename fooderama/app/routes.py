@@ -437,6 +437,33 @@ def setup_routes(app):
         
         return render_template('listar_lojas.html', restaurantes=restaurantes, medias_avaliacoes=medias_avaliacoes, food_type=food_type)
 
+    @app.route('/pratos_por_tipo')
+    @login_required
+    def pratos_por_tipo():
+        food_type = request.args.get('tipo', '')
+        
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        if food_type:
+            # Busca todos os pratos do tipo especificado, junto com o nome do restaurante
+            cursor.execute("""
+                SELECT p.*, r.NomeRestaurante, tp.Tipo
+                FROM prato p
+                JOIN restaurante r ON p.ID_Restaurante_FK = r.ID_Restaurante
+                JOIN tipo_prato tp ON p.ID_TipoPrato_FK = tp.ID_TipoPrato
+                WHERE tp.Tipo = %s AND p.StatusDisponibilidade = 1 AND p.Estoque > 0
+                ORDER BY p.Nome
+            """, (food_type,))
+            pratos = cursor.fetchall()
+        else:
+            pratos = []
+        
+        cursor.close()
+        conn.close()
+        
+        return render_template('pratos_por_tipo.html', pratos=pratos, tipo=food_type)
+
     @app.route('/restaurant')
     @login_required
     def restaurant():

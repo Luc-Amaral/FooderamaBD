@@ -1,111 +1,171 @@
-{% extends 'base.html' %}
-{% block conteudo %}
+{% extends 'base.html' %} {% block conteudo %}
 
 <div class="bg-white">
-
   <ul id="usersContainer"></ul>
 
   <div class="flex min-h-full flex-col items-center">
     <h2
-      class="mt-10 text-2xl font-semibold text-gray-900 text-left border-b border-gray-900/10 pb-4 pt-4 w-full max-w-[45.5rem]">
-      Informações Gerais</h2>
-    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-3xl ">
-
-
-      <a href="/listar_Lojas?food-type=Pizza"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      class="mt-10 text-2xl font-semibold text-gray-900 text-left border-b border-gray-900/10 pb-4 pt-4 w-full max-w-[45.5rem]"
+    >
+      Informações Gerais
+    </h2>
+    <div
+      class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-3xl"
+    >
+      <a
+        href="/pratos_por_tipo?tipo=Pizza"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/pizza.png" alt="Pizza"
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/pizza.png"
+            alt="Pizza"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Pizza</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Massa"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Massa"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/massa.png" alt="Massas"
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/massa.png"
+            alt="Massas"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Massa</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Comida Caseira"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Comida Caseira"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/comida caseira.png" alt="Comida Caseira"
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/comida caseira.png"
+            alt="Comida Caseira"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Caseira</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Sorvete"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Sorvete"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/sorvete.png" alt="Sorvete"
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/sorvete.png"
+            alt="Sorvete"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Sorvete</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Churrasco"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Churrasco"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/churrasco.png" alt="Churrasco"
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/churrasco.png"
+            alt="Churrasco"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Churrasco</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Lanche"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Lanche"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/lanche.png" alt="Lanche"
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/lanche.png"
+            alt="Lanche"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Lanche</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Frutos do Mar"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Frutos do Mar"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/frutos do mar.png" alt="Frutos do Mar"
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/frutos do mar.png"
+            alt="Frutos do Mar"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Frutos do Mar</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Vegetariana"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Vegetariana"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/vegetariana.png" alt="Vegetariana"
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/vegetariana.png"
+            alt="Vegetariana"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Vegetariana</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Japonesa"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Japonesa"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/japonesa.png" alt="Japonesa"
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/japonesa.png"
+            alt="Japonesa"
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Japonesa</h3>
       </a>
 
-      <a href="/listar_Lojas?food-type=Mexicana"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Mexicana"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/mexicana.png" alt=""
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/mexicana.png"
+            alt=""
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Mexicana</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Arabe"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Árabe"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/arabe.png" alt=""
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/arabe.png"
+            alt=""
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
-        <h3 class="mt-3 text-sm">Arabe</h3>
+        <h3 class="mt-3 text-sm">Árabe</h3>
       </a>
-      <a href="/listar_Lojas?food-type=Doces"
-        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3">
+      <a
+        href="/pratos_por_tipo?tipo=Doce"
+        class="group flex flex-col items-center w-[14.5rem] hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300 rounded-3xl pt-6 pb-3"
+      >
         <div class="w-48 h-48 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/doce.png" alt=""
-            class="h-full w-full object-cover object-center group-hover:opacity-75">
+          <img
+            src="../static/images/tipos_comida/doce.png"
+            alt=""
+            class="h-full w-full object-cover object-center group-hover:opacity-75"
+          />
         </div>
         <h3 class="mt-3 text-sm">Doce</h3>
       </a>
