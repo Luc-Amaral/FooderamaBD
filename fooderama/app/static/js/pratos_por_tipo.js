@@ -237,9 +237,9 @@ function finalizarPedido() {
   fecharCheckout();
 }
 
-// Adicionar novo endereço (placeholder)
+// Adicionar novo endereço - abre em nova aba para não perder o pedido
 function adicionarEndereco() {
-  alert("Funcionalidade de adicionar endereço será implementada em breve.");
+  window.open('/cadastrar_endereco', '_blank');
 }
 
 // Eventos de inicialização
