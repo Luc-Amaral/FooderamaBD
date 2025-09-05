@@ -37,9 +37,11 @@ async function carregarMetodosPagamento() {
     const metodos = await response.json();
     console.log("Métodos de pagamento recebidos:", metodos);
 
-    const paymentMethodsDiv = document.getElementById("payment-methods");
-    if (paymentMethodsDiv) {
-      paymentMethodsDiv.innerHTML = "";
+    const paymentSelect = document.getElementById("payment-method-select");
+    if (paymentSelect) {
+      // Limpar opções existentes (exceto a primeira)
+      paymentSelect.innerHTML =
+        '<option value="">Selecione um método de pagamento</option>';
 
       if (metodos.length === 0) {
         console.log("Nenhum método de pagamento encontrado");
@@ -90,19 +92,11 @@ async function carregarMetodosPagamento() {
 
           console.log("Display text:", displayText);
 
-          paymentMethodsDiv.innerHTML += `
-            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-              <input 
-                type="radio" 
-                name="payment-method" 
-                value="${metodo.ID_MetodoPagamento}" 
-                onchange="selecionarMetodoPagamento(${metodo.ID_MetodoPagamento}, '${metodo.TipoMetodo}')"
-                class="mr-3"
-              />
-              <span class="mr-2">${icon}</span>
-              <span>${displayText}</span>
-            </label>
-          `;
+          // Adicionar como option no select
+          const option = document.createElement("option");
+          option.value = metodo.ID_MetodoPagamento;
+          option.textContent = displayText;
+          paymentSelect.appendChild(option);
         });
       }
     } else {
@@ -341,7 +335,19 @@ function finalizarPedido() {
   fecharCheckout();
 }
 
-// Selecionar método de pagamento
+// Selecionar método de pagamento via dropdown
+function onPaymentMethodChange() {
+  const paymentSelect = document.getElementById("payment-method-select");
+  if (paymentSelect.value) {
+    selectedPaymentMethod = { id: paymentSelect.value, tipo: "dropdown" };
+    atualizarBotaoConfirmar();
+  } else {
+    selectedPaymentMethod = null;
+    atualizarBotaoConfirmar();
+  }
+}
+
+// Selecionar método de pagamento (função legacy para compatibilidade)
 function selecionarMetodoPagamento(id, tipo) {
   selectedPaymentMethod = { id: id, tipo: tipo };
   atualizarBotaoConfirmar();

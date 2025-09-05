@@ -37,17 +37,16 @@ async function carregarMetodosPagamento() {
     const metodos = await response.json();
     console.log("Métodos de pagamento recebidos:", metodos);
 
-    const paymentMethodsDiv = document.getElementById("payment-methods");
-    if (paymentMethodsDiv) {
-      paymentMethodsDiv.innerHTML = "";
+    const paymentSelect = document.getElementById("payment-method-select");
+    if (paymentSelect) {
+      // Limpar opções existentes
+      paymentSelect.innerHTML =
+        '<option value="">Selecione um método de pagamento</option>';
 
       if (metodos.length === 0) {
         console.log("Nenhum método de pagamento encontrado");
-        paymentMethodsDiv.innerHTML = `
-          <div class="text-center text-gray-500 text-sm py-2">
-            Nenhum método de pagamento cadastrado
-          </div>
-        `;
+        paymentSelect.innerHTML +=
+          '<option value="" disabled>Nenhum método cadastrado</option>';
       } else {
         console.log("Renderizando", metodos.length, "métodos de pagamento");
         metodos.forEach((metodo) => {
@@ -90,26 +89,21 @@ async function carregarMetodosPagamento() {
 
           console.log("Display text:", displayText);
 
-          paymentMethodsDiv.innerHTML += `
-            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-              <input 
-                type="radio" 
-                name="payment-method" 
-                value="${metodo.ID_MetodoPagamento}" 
-                onchange="selecionarMetodoPagamento(${metodo.ID_MetodoPagamento}, '${metodo.TipoMetodo}')"
-                class="mr-3"
-              />
-              <span class="mr-2">${icon}</span>
-              <span>${displayText}</span>
-            </label>
-          `;
+          // Adicionar como option no select
+          const option = document.createElement("option");
+          option.value = metodo.ID_MetodoPagamento;
+          option.textContent = displayText;
+          paymentSelect.appendChild(option);
         });
       }
-    } else {
-      console.error("Elemento payment-methods não encontrado");
     }
   } catch (error) {
     console.error("Erro ao carregar métodos de pagamento:", error);
+    const paymentSelect = document.getElementById("payment-method-select");
+    if (paymentSelect) {
+      paymentSelect.innerHTML =
+        '<option value="" disabled>Erro ao carregar métodos</option>';
+    }
   }
 }
 
@@ -339,7 +333,19 @@ function finalizarPedido() {
   fecharCheckout();
 }
 
-// Selecionar método de pagamento
+// Selecionar método de pagamento via dropdown
+function onPaymentMethodChange() {
+  const paymentSelect = document.getElementById("payment-method-select");
+  if (paymentSelect.value) {
+    selectedPaymentMethod = { id: paymentSelect.value, tipo: "dropdown" };
+    atualizarBotaoConfirmar();
+  } else {
+    selectedPaymentMethod = null;
+    atualizarBotaoConfirmar();
+  }
+}
+
+// Selecionar método de pagamento (função legacy para compatibilidade)
 function selecionarMetodoPagamento(id, tipo) {
   selectedPaymentMethod = { id: id, tipo: tipo };
   atualizarBotaoConfirmar();

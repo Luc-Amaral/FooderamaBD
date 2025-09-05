@@ -132,6 +132,7 @@
     <div id="cartaoFields" class="flex flex-col gap-4 hidden">
       <h3 class="text-lg font-semibold text-gray-900 mb-2">Dados do Cartão</h3>
 
+      <!-- Número do Cartão -->
       <div class="flex flex-col">
         <label
           for="numero_cartao"
@@ -150,6 +151,7 @@
         </div>
       </div>
 
+      <!-- Nome do Portador -->
       <div class="flex flex-col">
         <label
           for="nome_portador"
@@ -167,7 +169,8 @@
         </div>
       </div>
 
-      <div class="flex gap-x-4">
+      <!-- Data de Vencimento e CVV -->
+      <div class="flex flex-row gap-4">
         <div class="flex flex-col w-1/2">
           <label
             for="data_vencimento"
@@ -188,6 +191,7 @@
             />
           </div>
         </div>
+
         <div class="flex flex-col w-1/2">
           <label for="cvv" class="block text-sm font-medium text-gray-900"
             >CVV</label
@@ -218,6 +222,7 @@
   </form>
 </div>
 
+<!-- Lista de Métodos Cadastrados -->
 <div
   class="flex flex-col bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-10 mb-4"
 >
@@ -292,6 +297,34 @@
         </div>
         {% endif %}
       </div>
+
+      <!-- Botão de excluir -->
+      <form
+        action="/excluir_pagamento/{{ metodo.ID_MetodoPagamento }}"
+        method="POST"
+        onsubmit="return confirm('Tem certeza que deseja excluir este método de pagamento?')"
+        class="inline"
+      >
+        <button
+          type="submit"
+          class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-colors"
+          title="Excluir método de pagamento"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        </button>
+      </form>
     </div>
     {% endfor %}
   </div>
@@ -307,41 +340,30 @@
 
 <script>
   function toggleCartaoFields() {
-    console.log("toggleCartaoFields chamada!");
-
     const cartaoFields = document.getElementById("cartaoFields");
     const numeroCartao = document.getElementById("numero_cartao");
     const nomePortador = document.getElementById("nome_portador");
     const dataVencimento = document.getElementById("data_vencimento");
     const cvv = document.getElementById("cvv");
 
-    console.log("cartaoFields encontrado:", cartaoFields);
-
     const selectedRadio = document.querySelector(
       'input[name="tipo_metodo"]:checked'
     );
 
-    console.log("selectedRadio:", selectedRadio);
-
     if (!selectedRadio) {
-      // Se nenhum radio button estiver selecionado, ocultar campos do cartão
-      console.log("Nenhum radio selecionado - ocultando campos");
       cartaoFields.classList.add("hidden");
       return;
     }
 
     const selectedValue = selectedRadio.value;
-    console.log("selectedValue:", selectedValue);
 
     if (selectedValue === "Debito" || selectedValue === "Credito") {
-      console.log("Mostrando campos do cartão");
       cartaoFields.classList.remove("hidden");
       numeroCartao.required = true;
       nomePortador.required = true;
       dataVencimento.required = true;
       cvv.required = true;
     } else {
-      console.log("Ocultando campos do cartão");
       cartaoFields.classList.add("hidden");
       numeroCartao.required = false;
       nomePortador.required = false;
@@ -356,7 +378,7 @@
     }
   }
 
-  // Formatar número do cartão
+  // Formatação automática
   document
     .getElementById("numero_cartao")
     .addEventListener("input", function (e) {
@@ -365,23 +387,19 @@
       e.target.value = formattedValue;
     });
 
-  // Formatar CVV (apenas números)
   document.getElementById("cvv").addEventListener("input", function (e) {
     e.target.value = e.target.value.replace(/[^0-9]/g, "");
   });
 
-  // Função para formatar a data de vencimento no formato MM/AA
   function formatExpiry(input) {
-    let value = input.value.replace(/\D/g, ""); // Remove tudo que não é número
-
+    let value = input.value.replace(/\D/g, "");
     if (value.length >= 2) {
       value = value.substring(0, 2) + "/" + value.substring(2, 4);
     }
-
     input.value = value;
   }
 
-  // Validação do formulário antes do envio
+  // Validação do formulário
   document
     .getElementById("pagamentoForm")
     .addEventListener("submit", function (e) {
@@ -415,7 +433,6 @@
           return false;
         }
 
-        // Validar formato da data MM/AA
         const datePattern = /^\d{2}\/\d{2}$/;
         if (!datePattern.test(dataVencimento)) {
           e.preventDefault();

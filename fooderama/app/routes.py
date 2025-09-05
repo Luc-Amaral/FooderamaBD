@@ -882,6 +882,46 @@ def setup_routes(app):
         
         return jsonify(metodos)
     
+    @app.route('/excluir_pagamento/<metodo_id>', methods=['POST'])
+    @login_required
+    def excluir_pagamento(metodo_id):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Primeiro, verificar se o método pertence ao usuário atual
+            cursor.execute("""
+                SELECT ID_MetodoPagamento FROM metodo_pagamento 
+                WHERE ID_MetodoPagamento = %s AND ID_Cliente_FK = %s
+            """, (metodo_id, current_user.id))
+            
+            if not cursor.fetchone():
+                flash('Método de pagamento não encontrado.', 'error')
+                return redirect('/cadastrar_pagamento')
+            
+            # Excluir dados do cartão associado (se houver)
+            cursor.execute("""
+                DELETE FROM cartao WHERE ID_MetodoPagamento_FK = %s
+            """, (metodo_id,))
+            
+            # Excluir o método de pagamento
+            cursor.execute("""
+                DELETE FROM metodo_pagamento WHERE ID_MetodoPagamento = %s
+            """, (metodo_id,))
+            
+            conn.commit()
+            flash('Método de pagamento excluído com sucesso!', 'success')
+            
+        except Exception as e:
+            conn.rollback()
+            print(f"Erro ao excluir método de pagamento: {e}")
+            flash('Erro ao excluir método de pagamento.', 'error')
+        finally:
+            cursor.close()
+            conn.close()
+        
+        return redirect('/cadastrar_pagamento')
+    
 
     @app.route('/aceitar_pedido/<pedido_id>', methods=['POST'])
     @login_required
