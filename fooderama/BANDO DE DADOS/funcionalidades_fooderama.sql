@@ -16,7 +16,9 @@ DELIMITER //
 -- ---------------------------------------------------------------
 -- TRIGGER: Verificação de estoque antes de inserir item no pedido
 -- ---------------------------------------------------------------
-CREATE OR REPLACE TRIGGER tr_verificar_estoque_item
+DROP TRIGGER IF EXISTS tr_verificar_estoque_item //
+
+CREATE TRIGGER tr_verificar_estoque_item
 BEFORE INSERT ON item
 FOR EACH ROW
 BEGIN
@@ -45,7 +47,9 @@ END //
 -- ---------------------------------------------------------------
 -- TRIGGER: Verificação de estoque antes de atualizar item no pedido
 -- ---------------------------------------------------------------
-CREATE OR REPLACE TRIGGER tr_verificar_estoque_item_update
+DROP TRIGGER IF EXISTS tr_verificar_estoque_item_update //
+
+CREATE TRIGGER tr_verificar_estoque_item_update
 BEFORE UPDATE ON item
 FOR EACH ROW
 BEGIN
@@ -75,7 +79,9 @@ END //
 -- ---------------------------------------------------------------
 -- TRIGGER: Atualizar estoque após inserir item no pedido
 -- ---------------------------------------------------------------
-CREATE OR REPLACE TRIGGER tr_atualizar_estoque_item_insert
+DROP TRIGGER IF EXISTS tr_atualizar_estoque_item_insert //
+
+CREATE TRIGGER tr_atualizar_estoque_item_insert
 AFTER INSERT ON item
 FOR EACH ROW
 BEGIN
@@ -97,7 +103,9 @@ END //
 -- ---------------------------------------------------------------
 -- TRIGGER: Atualizar disponibilidade do prato baseado no estoque
 -- ---------------------------------------------------------------
-CREATE OR REPLACE TRIGGER tr_atualizar_disponibilidade_estoque
+DROP TRIGGER IF EXISTS tr_atualizar_disponibilidade_estoque //
+
+CREATE TRIGGER tr_atualizar_disponibilidade_estoque
 AFTER UPDATE ON prato
 FOR EACH ROW
 BEGIN
