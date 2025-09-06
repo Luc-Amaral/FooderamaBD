@@ -118,3 +118,53 @@ END //
 
 DELIMITER ;
 
+-- ===============================================================
+-- STORED PROCEDURES
+-- ===============================================================
+
+DELIMITER //
+
+-- ---------------------------------------------------------------
+-- PROCEDURE: Calcular total de um pedido
+-- ---------------------------------------------------------------
+DROP PROCEDURE IF EXISTS calcular_total_pedido //
+
+CREATE PROCEDURE calcular_total_pedido(
+    IN pedido_id CHAR(36), 
+    OUT total DOUBLE
+)
+BEGIN
+    DECLARE item_quantidade INT;
+    DECLARE item_preco DOUBLE;
+    DECLARE pedido_total DOUBLE DEFAULT 0;
+
+    -- Cursor para iterar sobre os itens do pedido
+    DECLARE item_cursor CURSOR FOR
+        SELECT i.Quantidade, pr.Preco
+        FROM item i
+        JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+        WHERE i.ID_Pedido_FK = pedido_id;
+
+    -- Handler para encerrar o cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET item_quantidade = NULL;
+
+    -- Abrir o cursor
+    OPEN item_cursor;
+
+    -- Iterar sobre os itens do pedido e calcular o total
+    item_loop: LOOP
+        FETCH item_cursor INTO item_quantidade, item_preco;
+        IF item_quantidade IS NULL THEN
+            LEAVE item_loop;
+        END IF;
+        SET pedido_total = pedido_total + (item_quantidade * item_preco);
+    END LOOP;
+
+    -- Fechar o cursor
+    CLOSE item_cursor;
+
+    -- Retornar o total do pedido
+    SET total = pedido_total;
+END //
+
+DELIMITER ;

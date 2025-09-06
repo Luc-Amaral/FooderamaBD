@@ -324,15 +324,41 @@ function finalizarPedido() {
     return;
   }
 
-  // Simular finalização do pedido
-  alert("Pedido confirmado! Em breve você receberá a confirmação.");
+  // Preparar dados do carrinho
+  const cartItems = cart.map((item) => ({
+    id: item.id,
+    quantidade: item.quantidade,
+  }));
 
-  // Limpar carrinho
-  cart = [];
-  currentRestaurantId = null;
-  selectedPaymentMethod = null;
-  atualizarCarrinho();
-  fecharCheckout();
+  // Fazer requisição para finalizar pedido
+  fetch("/finalizar_compra", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      payment_method: selectedPaymentMethod.id,
+      cart_items: cartItems,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        alert("Erro: " + data.error);
+      } else {
+        alert(data.message);
+        // Limpar carrinho
+        cart = [];
+        currentRestaurantId = null;
+        selectedPaymentMethod = null;
+        atualizarCarrinho();
+        fecharCheckout();
+      }
+    })
+    .catch((error) => {
+      console.error("Erro ao finalizar pedido:", error);
+      alert("Erro ao enviar pedido. Tente novamente.");
+    });
 }
 
 // Selecionar método de pagamento via dropdown

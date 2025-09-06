@@ -676,8 +676,8 @@ def setup_routes(app):
 
             # Insere o pedido na tabela pedido com status = FINALIZADO
             cursor.execute("""
-                INSERT INTO pedido (ID_Pedido, ID_Cliente_FK, ID_Endereco_FK, Data, Hora, FormaPagamento, status)
-                VALUES (%s, %s, %s, CURDATE(), CURTIME(), %s, 'PENDENTE')
+                INSERT INTO pedido (ID_Pedido, ID_Cliente_FK, ID_Endereco_FK, ID_MetodoPagamento_FK, Data, Hora, status)
+                VALUES (%s, %s, %s, %s, CURDATE(), CURTIME(), 'PENDENTE')
             """, (id_pedido, current_user.id, id_endereco, payment_method))
             conn.commit()
 
@@ -991,10 +991,11 @@ def setup_routes(app):
 
         # Buscar pedidos pendentes para o restaurante atual
         cursor.execute("""
-            SELECT DISTINCT p.ID_Pedido, p.FormaPagamento as payment_method, p.Data as date, p.Hora as time, p.status as status
+            SELECT DISTINCT p.ID_Pedido, mp.TipoMetodo as payment_method, p.Data as date, p.Hora as time, p.status as status
             FROM pedido p
             JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
             JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+            JOIN metodo_pagamento mp ON p.ID_MetodoPagamento_FK = mp.ID_MetodoPagamento
             WHERE p.status = 'PENDENTE' AND pr.ID_Restaurante_FK = %s
         """, (current_user.id,))
         orders = cursor.fetchall()
@@ -1004,14 +1005,15 @@ def setup_routes(app):
             cursor.execute("CALL calcular_total_pedido(%s, @total)", (order['ID_Pedido'],))
             cursor.execute("SELECT @total AS total")
             total_result = cursor.fetchone()
-            order['total'] = total_result['total'] * 0.97  # Subtrair 3%
+            order['total'] = total_result['total'] * 0.97 if total_result['total'] else 0  # Subtrair 3%
 
         # Buscar histórico de pedidos para o restaurante atual
         cursor.execute("""
-            SELECT DISTINCT p.ID_Pedido, p.FormaPagamento as payment_method, p.Data as date, p.Hora as time, p.status as status
+            SELECT DISTINCT p.ID_Pedido, mp.TipoMetodo as payment_method, p.Data as date, p.Hora as time, p.status as status
             FROM pedido p
             JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
             JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+            JOIN metodo_pagamento mp ON p.ID_MetodoPagamento_FK = mp.ID_MetodoPagamento
             WHERE p.status != 'PENDENTE' AND pr.ID_Restaurante_FK = %s
         """, (current_user.id,))
         historical_orders = cursor.fetchall()
@@ -1021,7 +1023,7 @@ def setup_routes(app):
             cursor.execute("CALL calcular_total_pedido(%s, @total)", (order['ID_Pedido'],))
             cursor.execute("SELECT @total AS total")
             total_result = cursor.fetchone()
-            order['total'] = total_result['total'] * 0.97  # Subtrair 3%
+            order['total'] = total_result['total'] * 0.97 if total_result['total'] else 0  # Subtrair 3%
 
         cursor.close()
         conn.close()
@@ -1126,9 +1128,10 @@ def setup_routes(app):
 
         # Buscar histórico de pedidos aceitos do cliente
         cursor.execute("""
-            SELECT ID_Pedido, FormaPagamento as payment_method, Data as date, Hora as time, status
-            FROM pedido
-            WHERE ID_Cliente_FK = %s AND status = 'ACEITO'
+            SELECT p.ID_Pedido, mp.TipoMetodo as payment_method, p.Data as date, p.Hora as time, p.status
+            FROM pedido p
+            JOIN metodo_pagamento mp ON p.ID_MetodoPagamento_FK = mp.ID_MetodoPagamento
+            WHERE p.ID_Cliente_FK = %s AND p.status = 'ACEITO'
         """, (current_user.id,))
         orders = cursor.fetchall()
 
@@ -1137,7 +1140,7 @@ def setup_routes(app):
             cursor.execute("CALL calcular_total_pedido(%s, @total)", (order['ID_Pedido'],))
             cursor.execute("SELECT @total AS total")
             total_result = cursor.fetchone()
-            order['total'] = total_result['total']
+            order['total'] = total_result['total'] if total_result['total'] else 0
 
         cursor.close()
         conn.close()
