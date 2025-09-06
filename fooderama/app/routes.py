@@ -989,8 +989,26 @@ def setup_routes(app):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Usar o procedimento para obter pedidos pendentes com totais já calculados
-        cursor.execute("CALL obter_pedidos_restaurante(%s)", (current_user.id,))
+        # Query direta para pedidos pendentes com totais já calculados
+        cursor.execute("""
+            SELECT DISTINCT 
+                p.ID_Pedido, 
+                mp.TipoMetodo as payment_method, 
+                p.Data as date, 
+                p.Hora as time, 
+                p.status as status,
+                ROUND((
+                    SELECT SUM(pr.Preco * i.Quantidade) * 0.97
+                    FROM item i
+                    JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+                    WHERE i.ID_Pedido_FK = p.ID_Pedido
+                ), 2) as total
+            FROM pedido p
+            JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
+            JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+            JOIN metodo_pagamento mp ON p.ID_MetodoPagamento_FK = mp.ID_MetodoPagamento
+            WHERE p.status = 'PENDENTE' AND pr.ID_Restaurante_FK = %s
+        """, (current_user.id,))
         orders = cursor.fetchall()
 
         # Buscar histórico de pedidos para o restaurante atual
@@ -1027,8 +1045,26 @@ def setup_routes(app):
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
 
-            # Usar o procedimento para obter pedidos com totais já calculados
-            cursor.execute("CALL obter_pedidos_restaurante(%s)", (current_user.id,))
+            # Query direta para evitar problemas com procedimentos
+            cursor.execute("""
+                SELECT DISTINCT 
+                    p.ID_Pedido, 
+                    mp.TipoMetodo as payment_method, 
+                    p.Data as date, 
+                    p.Hora as time, 
+                    p.status as status,
+                    ROUND((
+                        SELECT SUM(pr.Preco * i.Quantidade) * 0.97
+                        FROM item i
+                        JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+                        WHERE i.ID_Pedido_FK = p.ID_Pedido
+                    ), 2) as total
+                FROM pedido p
+                JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
+                JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+                JOIN metodo_pagamento mp ON p.ID_MetodoPagamento_FK = mp.ID_MetodoPagamento
+                WHERE p.status = 'PENDENTE' AND pr.ID_Restaurante_FK = %s
+            """, (current_user.id,))
             orders = cursor.fetchall()
 
             # Converter data e hora para string para JSON
