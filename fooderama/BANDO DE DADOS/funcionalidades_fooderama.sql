@@ -167,4 +167,33 @@ BEGIN
     SET total = pedido_total;
 END //
 
+-- ---------------------------------------------------------------
+-- PROCEDURE: Obter pedidos pendentes do restaurante com totais calculados
+-- ---------------------------------------------------------------
+DELIMITER //
+DROP PROCEDURE IF EXISTS obter_pedidos_restaurante //
+
+CREATE PROCEDURE obter_pedidos_restaurante(
+    IN restaurante_id CHAR(36)
+)
+BEGIN
+    SELECT DISTINCT 
+        p.ID_Pedido, 
+        mp.TipoMetodo as payment_method, 
+        p.Data as date, 
+        p.Hora as time, 
+        p.status as status,
+        ROUND((
+            SELECT SUM(pr.Preco * i.Quantidade) * 0.97
+            FROM item i
+            JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+            WHERE i.ID_Pedido_FK = p.ID_Pedido
+        ), 2) as total
+    FROM pedido p
+    JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
+    JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+    JOIN metodo_pagamento mp ON p.ID_MetodoPagamento_FK = mp.ID_MetodoPagamento
+    WHERE p.status = 'PENDENTE' AND pr.ID_Restaurante_FK = restaurante_id;
+END //
+
 DELIMITER ;

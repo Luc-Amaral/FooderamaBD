@@ -989,23 +989,9 @@ def setup_routes(app):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Buscar pedidos pendentes para o restaurante atual
-        cursor.execute("""
-            SELECT DISTINCT p.ID_Pedido, mp.TipoMetodo as payment_method, p.Data as date, p.Hora as time, p.status as status
-            FROM pedido p
-            JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
-            JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
-            JOIN metodo_pagamento mp ON p.ID_MetodoPagamento_FK = mp.ID_MetodoPagamento
-            WHERE p.status = 'PENDENTE' AND pr.ID_Restaurante_FK = %s
-        """, (current_user.id,))
+        # Usar o procedimento para obter pedidos pendentes com totais já calculados
+        cursor.execute("CALL obter_pedidos_restaurante(%s)", (current_user.id,))
         orders = cursor.fetchall()
-
-        # Calcular o valor total de cada pedido pendente e subtrair 3%
-        for order in orders:
-            cursor.execute("CALL calcular_total_pedido(%s, @total)", (order['ID_Pedido'],))
-            cursor.execute("SELECT @total AS total")
-            total_result = cursor.fetchone()
-            order['total'] = total_result['total'] * 0.97 if total_result['total'] else 0  # Subtrair 3%
 
         # Buscar histórico de pedidos para o restaurante atual
         cursor.execute("""
@@ -1029,6 +1015,35 @@ def setup_routes(app):
         conn.close()
 
         return render_template('historico_rest.html', orders=orders, historical_orders=historical_orders)
+    
+    @app.route('/api/get_restaurant_orders')
+    @login_required
+    def get_restaurant_orders():
+        """API para obter pedidos do restaurante em JSON (para atualização dinâmica)"""
+        if not isinstance(current_user, Restaurante):
+            return jsonify({'error': 'Acesso negado - apenas restaurantes'}), 403
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+
+            # Usar o procedimento para obter pedidos com totais já calculados
+            cursor.execute("CALL obter_pedidos_restaurante(%s)", (current_user.id,))
+            orders = cursor.fetchall()
+
+            # Converter data e hora para string para JSON
+            for order in orders:
+                order['date'] = str(order['date'])
+                order['time'] = str(order['time'])
+
+            cursor.close()
+            conn.close()
+
+            return jsonify({'orders': orders})
+
+        except Exception as e:
+            print(f"DEBUG: Erro na API get_restaurant_orders: {str(e)}")
+            return jsonify({'error': str(e)}), 500
     
 
     @app.route('/submit_review', methods=['POST'])
