@@ -956,17 +956,28 @@ def setup_routes(app):
     @app.route('/recusar_pedido/<pedido_id>', methods=['POST'])
     @login_required
     def recusar_pedido(pedido_id):
+        if not isinstance(current_user, Restaurante):
+            flash('Apenas restaurantes podem recusar pedidos.', 'danger')
+            return redirect(url_for('index'))
+
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
             cursor.execute("""
-                UPDATE pedido
-                SET status = 'RECUSADO'
-                WHERE ID_Pedido = %s
-            """, (pedido_id,))
-            conn.commit()
-            flash('Pedido recusado com sucesso!', 'success')
+                UPDATE pedido p
+                JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
+                JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+                SET p.status = 'RECUSADO'
+                WHERE p.ID_Pedido = %s AND pr.ID_Restaurante_FK = %s
+            """, (pedido_id, current_user.id))
+
+            if cursor.rowcount == 0:
+                flash('Pedido não encontrado ou não pertence ao seu restaurante.', 'warning')
+            else:
+                conn.commit()
+                flash('Pedido recusado com sucesso!', 'success')
+
         except Exception as e:
             conn.rollback()
             flash(f'Erro ao recusar pedido: {str(e)}', 'danger')

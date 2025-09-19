@@ -128,7 +128,7 @@ CREATE TABLE `feedback` (
 CREATE TABLE `endereco_cliente` (
   `ID_Endereco_FK` char(36) NOT NULL,
   `ID_Cliente_FK` char(36) NOT NULL,
-  `Data_Atualizacao` timestamp NOT NULL,
+  `Data_Atualizacao` timestamp DEFAULT NOW(),
   PRIMARY KEY (`ID_Endereco_FK`,`ID_Cliente_FK`),
   CONSTRAINT `endereco_cliente_ibfk_1` FOREIGN KEY (`ID_Cliente_FK`) REFERENCES `cliente` (`ID_Cliente`) ON DELETE CASCADE,
   CONSTRAINT `endereco_cliente_ibfk_2` FOREIGN KEY (`ID_Endereco_FK`) REFERENCES `endereco` (`ID_Endereco`) ON DELETE CASCADE

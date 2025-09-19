@@ -1,147 +1,153 @@
 -- ===============================================================
--- INICIALIZAÇÃO DO BANCO FOODERAMA - PARTE 3: FUNCIONALIDADES
--- Arquivo: 03-funcionalidades-fooderama.sql
+-- FUNCIONALIDADES AVANÇADAS DO SISTEMA FOODERAMA
+-- Arquivo: funcionalidades_fooderama.sql
+-- Criado em: 01/09/2025
 -- Descrição: Triggers, funções e procedimentos para o sistema
 -- ===============================================================
 
-USE fooderama;
+
 
 -- ===============================================================
--- TRIGGERS DE VALIDAÇÃO E AUDITORIA
+-- TRIGGERS DE VALIDAÇÃO
 -- ===============================================================
 
 DELIMITER //
 
 -- ---------------------------------------------------------------
--- TRIGGER: Validação de dados do cliente antes da inserção
+-- TRIGGER: Verificação de estoque antes de inserir item no pedido
 -- ---------------------------------------------------------------
-DROP TRIGGER IF EXISTS tr_validar_cliente_insert //
+DROP TRIGGER IF EXISTS tr_verificar_estoque_item //
 
-CREATE TRIGGER tr_validar_cliente_insert
-BEFORE INSERT ON cliente
+CREATE TRIGGER tr_verificar_estoque_item
+BEFORE INSERT ON item
 FOR EACH ROW
 BEGIN
-    -- Validar formato do email
-    IF NEW.Email NOT REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$' THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Formato de email inválido';
-    END IF;
+    DECLARE estoque_disponivel INT DEFAULT 0;
+    DECLARE nome_prato VARCHAR(100);
     
-    -- Validar CPF (11 dígitos)
-    IF LENGTH(NEW.CPF) != 11 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'CPF deve ter exatamente 11 dígitos';
-    END IF;
-    
-    -- Validar telefone (10 ou 11 dígitos)
-    IF LENGTH(NEW.Telefone) NOT IN (10, 11) THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Telefone deve ter 10 ou 11 dígitos';
-    END IF;
-END //
-
--- ---------------------------------------------------------------
--- TRIGGER: Validação de dados do restaurante antes da inserção
--- ---------------------------------------------------------------
-DROP TRIGGER IF EXISTS tr_validar_restaurante_insert //
-
-CREATE TRIGGER tr_validar_restaurante_insert
-BEFORE INSERT ON restaurante
-FOR EACH ROW
-BEGIN
-    -- Validar formato do email
-    IF NEW.Email NOT REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$' THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Formato de email inválido';
-    END IF;
-    
-    -- Validar CNPJ (14 dígitos)
-    IF LENGTH(NEW.CNPJ) != 14 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'CNPJ deve ter exatamente 14 dígitos';
-    END IF;
-    
-    -- Validar telefone (10 ou 11 dígitos)
-    IF LENGTH(NEW.Telefone) NOT IN (10, 11) THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Telefone deve ter 10 ou 11 dígitos';
-    END IF;
-END //
-
--- ---------------------------------------------------------------
--- TRIGGER: Validação do preço do prato
--- ---------------------------------------------------------------
-DROP TRIGGER IF EXISTS tr_validar_prato_preco //
-
-CREATE TRIGGER tr_validar_prato_preco
-BEFORE INSERT ON prato
-FOR EACH ROW
-BEGIN
-    -- Validar se o preço é positivo
-    IF NEW.Preco <= 0 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'O preço do prato deve ser maior que zero';
-    END IF;
-    
-    -- Validar se o preço não é absurdamente alto (mais de R$ 1000)
-    IF NEW.Preco > 1000.00 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'O preço do prato não pode exceder R$ 1000,00';
-    END IF;
-END //
-
--- ---------------------------------------------------------------
--- TRIGGER: Atualizar valor total do pedido automaticamente
--- ---------------------------------------------------------------
-DROP TRIGGER IF EXISTS tr_atualizar_valor_pedido //
-
-CREATE TRIGGER tr_atualizar_valor_pedido
-BEFORE INSERT ON pedido
-FOR EACH ROW
-BEGIN
-    DECLARE preco_prato DECIMAL(10,2);
-    
-    -- Buscar o preço do prato
-    SELECT Preco INTO preco_prato
+    -- Buscar o estoque disponível do prato
+    SELECT Estoque, Nome
+    INTO estoque_disponivel, nome_prato
     FROM prato 
     WHERE ID_Prato = NEW.ID_Prato_FK;
     
-    -- Definir o valor total como o preço do prato
-    SET NEW.Valor_Total = preco_prato;
-    
-    -- Definir a data do pedido como agora se não foi fornecida
-    IF NEW.Data_Pedido IS NULL THEN
-        SET NEW.Data_Pedido = NOW();
+    -- Verificar se há estoque suficiente
+    IF estoque_disponivel <= 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = CONCAT('Estoque insuficiente para o prato: ', nome_prato, '. Estoque atual: ', estoque_disponivel);
     END IF;
     
-    -- Definir status padrão se não foi fornecido
-    IF NEW.Status_Pedido IS NULL OR NEW.Status_Pedido = '' THEN
-        SET NEW.Status_Pedido = 'Pendente';
+    -- Verificar se a quantidade solicitada não excede o estoque
+    IF NEW.Quantidade > estoque_disponivel THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = CONCAT('Quantidade solicitada (', NEW.Quantidade, ') excede o estoque disponível (', estoque_disponivel, ') para o prato: ', nome_prato);
     END IF;
 END //
 
 -- ---------------------------------------------------------------
--- TRIGGER: Validação da nota de avaliação
+-- TRIGGER: Verificação de estoque antes de atualizar item no pedido
 -- ---------------------------------------------------------------
-DROP TRIGGER IF EXISTS tr_validar_avaliacao //
+DROP TRIGGER IF EXISTS tr_verificar_estoque_item_update //
 
-CREATE TRIGGER tr_validar_avaliacao
-BEFORE INSERT ON avaliacao
+CREATE TRIGGER tr_verificar_estoque_item_update
+BEFORE UPDATE ON item
 FOR EACH ROW
 BEGIN
-    -- Validar se a nota está entre 1 e 5
-    IF NEW.Nota < 1 OR NEW.Nota > 5 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'A nota da avaliação deve estar entre 1 e 5';
-    END IF;
+    DECLARE estoque_disponivel INT DEFAULT 0;
+    DECLARE nome_prato VARCHAR(100);
+    DECLARE diferenca_quantidade INT;
     
-    -- Definir a data da avaliação como agora se não foi fornecida
-    IF NEW.Data_Avaliacao IS NULL THEN
-        SET NEW.Data_Avaliacao = NOW();
+    -- Calcular diferença na quantidade (se aumentou)
+    SET diferenca_quantidade = NEW.Quantidade - OLD.Quantidade;
+    
+    -- Só verificar se a quantidade aumentou
+    IF diferenca_quantidade > 0 THEN
+        -- Buscar o estoque disponível do prato
+        SELECT Estoque, Nome
+        INTO estoque_disponivel, nome_prato
+        FROM prato 
+        WHERE ID_Prato = NEW.ID_Prato_FK;
+        
+        -- Verificar se há estoque suficiente para o aumento
+        IF diferenca_quantidade > estoque_disponivel THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = CONCAT('Estoque insuficiente para aumentar quantidade. Estoque disponível: ', estoque_disponivel, ' para o prato: ', nome_prato);
+        END IF;
     END IF;
 END //
 
-DELIMITER ;
+-- ---------------------------------------------------------------
+-- TRIGGER: Atualizar estoque após inserir item no pedido
+-- ---------------------------------------------------------------
+DROP TRIGGER IF EXISTS tr_atualizar_estoque_item_insert //
+
+CREATE TRIGGER tr_atualizar_estoque_item_insert
+AFTER INSERT ON item
+FOR EACH ROW
+BEGIN
+    -- Verificar se o pedido está aceito antes de decrementar estoque
+    DECLARE status_pedido VARCHAR(255);
+    
+    SELECT status INTO status_pedido
+    FROM pedido 
+    WHERE ID_Pedido = NEW.ID_Pedido_FK;
+    
+    -- Só decrementar estoque se o pedido estiver aceito
+    IF status_pedido = 'ACEITO' THEN
+        UPDATE prato 
+        SET Estoque = Estoque - NEW.Quantidade
+        WHERE ID_Prato = NEW.ID_Prato_FK;
+    END IF;
+END //
+
+-- ---------------------------------------------------------------
+-- TRIGGER: Atualizar disponibilidade do prato baseado no estoque
+-- ---------------------------------------------------------------
+DROP TRIGGER IF EXISTS tr_atualizar_disponibilidade_estoque //
+
+CREATE TRIGGER tr_atualizar_disponibilidade_estoque
+AFTER UPDATE ON prato
+FOR EACH ROW
+BEGIN
+    -- Se o estoque chegou a 0, marcar como indisponível
+    IF NEW.Estoque = 0 AND OLD.Estoque > 0 THEN
+        UPDATE prato 
+        SET StatusDisponibilidade = 0
+        WHERE ID_Prato = NEW.ID_Prato;
+    END IF;
+    
+    -- Se o estoque voltou a ter itens, marcar como disponível
+    IF NEW.Estoque > 0 AND OLD.Estoque = 0 THEN
+        UPDATE prato 
+        SET StatusDisponibilidade = 1
+        WHERE ID_Prato = NEW.ID_Prato;
+    END IF;
+END //
+
+DROP TRIGGER IF EXISTS tr_gerenciar_estoque_status_pedido //
+
+CREATE TRIGGER tr_gerenciar_estoque_status_pedido
+AFTER UPDATE ON pedido
+FOR EACH ROW
+BEGIN
+    -- DECREMENTA o estoque quando o restaurante ACEITA o pedido
+    IF NEW.status IN ('ACEITO', 'Em preparação') AND OLD.status NOT IN ('ACEITO', 'Em preparação') THEN
+        UPDATE prato p
+        JOIN item i ON p.ID_Prato = i.ID_Prato_FK
+        SET p.Estoque = p.Estoque - i.Quantidade
+        WHERE i.ID_Pedido_FK = NEW.ID_Pedido;
+    END IF;
+    
+    -- INCREMENTA o estoque (devolve os itens) se um pedido previamente aceito for CANCELADO
+    IF NEW.status = 'CANCELADO' AND OLD.status IN ('ACEITO', 'Em preparação') THEN
+        UPDATE prato p
+        JOIN item i ON p.ID_Prato = i.ID_Prato_FK
+        SET p.Estoque = p.Estoque + i.Quantidade
+        WHERE i.ID_Pedido_FK = NEW.ID_Pedido;
+    END IF;
+END //
+
+DELIMITER;
 
 -- ===============================================================
 -- STORED PROCEDURES
@@ -150,126 +156,75 @@ DELIMITER ;
 DELIMITER //
 
 -- ---------------------------------------------------------------
--- PROCEDURE: Buscar restaurantes por tipo de comida
+-- PROCEDURE: Calcular total de um pedido
 -- ---------------------------------------------------------------
-DROP PROCEDURE IF EXISTS sp_buscar_restaurantes_por_tipo //
+DROP PROCEDURE IF EXISTS calcular_total_pedido //
 
-CREATE PROCEDURE sp_buscar_restaurantes_por_tipo(
-    IN p_tipo_comida VARCHAR(30)
+CREATE PROCEDURE calcular_total_pedido(
+    IN pedido_id CHAR(36), 
+    OUT total DOUBLE
 )
 BEGIN
-    SELECT 
-        r.ID_Restaurante,
-        r.Nome_Restaurante,
-        r.Email,
-        r.Telefone,
-        tp.Tipo as Tipo_Comida,
-        COUNT(p.ID_Prato) as Total_Pratos,
-        COALESCE(AVG(a.Nota), 0) as Media_Avaliacoes
-    FROM restaurante r
-    JOIN tipo_prato tp ON r.ID_TipoPrato_FK = tp.ID_TipoPrato
-    LEFT JOIN prato p ON r.ID_Restaurante = p.ID_Restaurante_FK
-    LEFT JOIN avaliacao a ON r.ID_Restaurante = a.ID_Restaurante_FK
-    WHERE tp.Tipo LIKE CONCAT('%', p_tipo_comida, '%')
-    GROUP BY r.ID_Restaurante, r.Nome_Restaurante, r.Email, r.Telefone, tp.Tipo
-    ORDER BY Media_Avaliacoes DESC, Total_Pratos DESC;
+    DECLARE item_quantidade INT;
+    DECLARE item_preco DOUBLE;
+    DECLARE pedido_total DOUBLE DEFAULT 0;
+
+    -- Cursor para iterar sobre os itens do pedido
+    DECLARE item_cursor CURSOR FOR
+        SELECT i.Quantidade, pr.Preco
+        FROM item i
+        JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+        WHERE i.ID_Pedido_FK = pedido_id;
+
+    -- Handler para encerrar o cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET item_quantidade = NULL;
+
+    -- Abrir o cursor
+    OPEN item_cursor;
+
+    -- Iterar sobre os itens do pedido e calcular o total
+    item_loop: LOOP
+        FETCH item_cursor INTO item_quantidade, item_preco;
+        IF item_quantidade IS NULL THEN
+            LEAVE item_loop;
+        END IF;
+        SET pedido_total = pedido_total + (item_quantidade * item_preco);
+    END LOOP;
+
+    -- Fechar o cursor
+    CLOSE item_cursor;
+
+    -- Retornar o total do pedido
+    SET total = pedido_total;
 END //
 
 -- ---------------------------------------------------------------
--- PROCEDURE: Obter histórico de pedidos de um cliente
+-- PROCEDURE: Obter pedidos pendentes do restaurante com totais calculados
 -- ---------------------------------------------------------------
-DROP PROCEDURE IF EXISTS sp_historico_cliente //
+DELIMITER //
+DROP PROCEDURE IF EXISTS obter_pedidos_restaurante //
 
-CREATE PROCEDURE sp_historico_cliente(
-    IN p_cliente_id CHAR(36)
+CREATE PROCEDURE obter_pedidos_restaurante(
+    IN restaurante_id CHAR(36)
 )
 BEGIN
-    SELECT 
-        p.ID_Pedido,
-        p.Data_Pedido,
-        p.Status_Pedido,
-        p.Valor_Total,
-        r.Nome_Restaurante,
-        pr.Nome_Prato,
-        pr.Preco
+    SELECT DISTINCT 
+        p.ID_Pedido, 
+        mp.TipoMetodo as payment_method, 
+        p.Data as date, 
+        p.Hora as time, 
+        p.status as status,
+        ROUND((
+            SELECT SUM(pr.Preco * i.Quantidade) * 0.97
+            FROM item i
+            JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+            WHERE i.ID_Pedido_FK = p.ID_Pedido
+        ), 2) as total
     FROM pedido p
-    JOIN restaurante r ON p.ID_Restaurante_FK = r.ID_Restaurante
-    JOIN prato pr ON p.ID_Prato_FK = pr.ID_Prato
-    WHERE p.ID_Cliente_FK = p_cliente_id
-    ORDER BY p.Data_Pedido DESC;
-END //
-
--- ---------------------------------------------------------------
--- PROCEDURE: Obter estatísticas de um restaurante
--- ---------------------------------------------------------------
-DROP PROCEDURE IF EXISTS sp_estatisticas_restaurante //
-
-CREATE PROCEDURE sp_estatisticas_restaurante(
-    IN p_restaurante_id CHAR(36)
-)
-BEGIN
-    SELECT 
-        r.Nome_Restaurante,
-        COUNT(DISTINCT p.ID_Pedido) as Total_Pedidos,
-        COUNT(DISTINCT pr.ID_Prato) as Total_Pratos,
-        COALESCE(SUM(p.Valor_Total), 0) as Receita_Total,
-        COALESCE(AVG(a.Nota), 0) as Media_Avaliacoes,
-        COUNT(DISTINCT a.ID_Avaliacao) as Total_Avaliacoes
-    FROM restaurante r
-    LEFT JOIN pedido p ON r.ID_Restaurante = p.ID_Restaurante_FK
-    LEFT JOIN prato pr ON r.ID_Restaurante = pr.ID_Restaurante_FK
-    LEFT JOIN avaliacao a ON r.ID_Restaurante = a.ID_Restaurante_FK
-    WHERE r.ID_Restaurante = p_restaurante_id
-    GROUP BY r.ID_Restaurante, r.Nome_Restaurante;
+    JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
+    JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+    JOIN metodo_pagamento mp ON p.ID_MetodoPagamento_FK = mp.ID_MetodoPagamento
+    WHERE p.status = 'PENDENTE' AND pr.ID_Restaurante_FK = restaurante_id;
 END //
 
 DELIMITER ;
-
--- ===============================================================
--- VIEWS ÚTEIS
--- ===============================================================
-
--- ---------------------------------------------------------------
--- VIEW: Resumo de restaurantes com estatísticas
--- ---------------------------------------------------------------
-CREATE OR REPLACE VIEW vw_restaurantes_resumo AS
-SELECT 
-    r.ID_Restaurante,
-    r.Nome_Restaurante,
-    r.Email,
-    r.Telefone,
-    tp.Tipo as Tipo_Comida,
-    COUNT(DISTINCT p.ID_Prato) as Total_Pratos,
-    COUNT(DISTINCT ped.ID_Pedido) as Total_Pedidos,
-    COALESCE(AVG(a.Nota), 0) as Media_Avaliacoes,
-    COALESCE(SUM(ped.Valor_Total), 0) as Receita_Total
-FROM restaurante r
-JOIN tipo_prato tp ON r.ID_TipoPrato_FK = tp.ID_TipoPrato
-LEFT JOIN prato p ON r.ID_Restaurante = p.ID_Restaurante_FK
-LEFT JOIN pedido ped ON r.ID_Restaurante = ped.ID_Restaurante_FK
-LEFT JOIN avaliacao a ON r.ID_Restaurante = a.ID_Restaurante_FK
-GROUP BY r.ID_Restaurante, r.Nome_Restaurante, r.Email, r.Telefone, tp.Tipo;
-
--- ---------------------------------------------------------------
--- VIEW: Pedidos com informações completas
--- ---------------------------------------------------------------
-CREATE OR REPLACE VIEW vw_pedidos_completos AS
-SELECT 
-    p.ID_Pedido,
-    p.Data_Pedido,
-    p.Status_Pedido,
-    p.Valor_Total,
-    c.Nome as Cliente_Nome,
-    c.Email as Cliente_Email,
-    r.Nome_Restaurante,
-    pr.Nome_Prato,
-    pr.Preco as Preco_Prato,
-    tp.Tipo as Tipo_Comida
-FROM pedido p
-JOIN cliente c ON p.ID_Cliente_FK = c.ID_Cliente
-JOIN restaurante r ON p.ID_Restaurante_FK = r.ID_Restaurante
-JOIN prato pr ON p.ID_Prato_FK = pr.ID_Prato
-JOIN tipo_prato tp ON r.ID_TipoPrato_FK = tp.ID_TipoPrato;
-
--- Funcionalidades avançadas criadas com sucesso!
-SELECT 'Triggers, procedures e views criados com sucesso!' as status;
