@@ -61,38 +61,38 @@ Este comando irá:
 ### Verificar status dos containers:
 
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 ### Ver logs da aplicação:
 
 ```bash
-docker-compose logs web
+docker compose logs web
 ```
 
 ### Ver logs do banco de dados:
 
 ```bash
-docker-compose logs db
+docker compose logs db
 ```
 
 ### Parar a aplicação:
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ### Parar e remover volumes (apaga dados do banco):
 
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Reconstruir a aplicação após mudanças no código:
 
 ```bash
-docker-compose build web
-docker-compose up -d
+docker compose build web
+docker compose up -d
 ```
 
 ## Configurações
