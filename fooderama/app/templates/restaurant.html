@@ -259,6 +259,24 @@
         + Cadastrar Novo Método de Pagamento
       </button>
     </div>
+
+    <!-- Seção de observações -->
+    <div class="mb-4 border-t pt-4">
+      <label for="observacoes-pedido" class="block font-semibold text-gray-900 mb-2">
+        Observações do Pedido (opcional)
+      </label>
+      <textarea 
+        id="observacoes-pedido"
+        class="w-full border border-gray-300 rounded-md px-3 py-2 resize-none"
+        rows="3"
+        placeholder="Ex: sem cebola, bem passado, entregar no portão..."
+        maxlength="500"
+      ></textarea>
+      <div class="text-xs text-gray-500 mt-1">
+        Máximo 500 caracteres
+      </div>
+    </div>
+
     <button
       onclick="finalizarPedido()"
       id="confirm-order-btn"

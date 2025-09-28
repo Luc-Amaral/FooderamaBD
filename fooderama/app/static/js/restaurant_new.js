@@ -322,6 +322,9 @@ function finalizarPedido() {
     return;
   }
 
+  // Obter observações do campo de texto
+  const observacoes = document.getElementById("observacoes-pedido").value.trim();
+
   // Preparar dados do carrinho
   const cartItems = cart.map((item) => ({
     id: item.id,
@@ -337,6 +340,7 @@ function finalizarPedido() {
     body: JSON.stringify({
       payment_method: selectedPaymentMethod.id,
       cart_items: cartItems,
+      observacoes: observacoes,
     }),
   })
     .then((response) => response.json())

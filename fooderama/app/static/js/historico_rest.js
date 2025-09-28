@@ -1,16 +1,17 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Remover código de mudança automática de status - vamos mostrar apenas o status real do banco
 
-  // NOVO: Sistema de auto-refresh para novos pedidos
+  // NOVO: Sistema de auto-refresh para novos pedidos (DESABILITADO temporariamente)
   let lastUpdateTime = null;
   let lastKnownOrderCount = null; // Contar pedidos conhecidos
   let refreshInterval = null;
   let isPageVisible = true;
+  let autoRefreshEnabled = false; // DESABILITADO para não interferir com observações
 
   // Detectar quando a página fica visível/invisível
   document.addEventListener("visibilitychange", function () {
     isPageVisible = !document.hidden;
-    if (isPageVisible) {
+    if (isPageVisible && autoRefreshEnabled) {
       checkForNewOrders(); // Verificar imediatamente quando voltar à página
     }
   });
@@ -95,28 +96,45 @@ document.addEventListener("DOMContentLoaded", function () {
     // Adicionar novos pedidos
     orders.forEach((order) => {
       const row = document.createElement("tr");
-      row.className = "border-t";
+      row.className = "border-t hover:bg-gray-50";
+
+      // Criar célula de observações
+      let observacoesCell = '';
+      if (order.observacoes && order.observacoes.trim()) {
+        observacoesCell = `
+          <button 
+            type="button"
+            onclick="mostrarObservacoes('${order.ID_Pedido}', this)"
+            data-observacoes="${order.observacoes.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}"
+            class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium mb-2 transition-colors"
+            style="display: block !important;"
+          >
+            📋 Ver Observações
+          </button>
+        `;
+      } else {
+        observacoesCell = '<div class="w-full text-center text-gray-400 text-sm mb-2 py-2">Nenhuma observação</div>';
+      }
 
       row.innerHTML = `
-        <td class="py-4 pr-4">${order.ID_Pedido}</td>
-        <td class="py-4 pr-4">${order.payment_method}</td>
-        <td class="py-4 pr-4">${order.date} ${order.time}</td>
-        <td class="py-4 pr-4">${order.total.toFixed(2)}</td>
-        <td class="py-4 pr-4">
-          <form action="/aceitar_pedido/${
-            order.ID_Pedido
-          }" method="post" style="display: inline">
-            <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-lg mr-2">
-              Aceitar
-            </button>
-          </form>
-          <form action="/recusar_pedido/${
-            order.ID_Pedido
-          }" method="post" style="display: inline">
-            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-lg">
-              Recusar
-            </button>
-          </form>
+        <td class="py-4 pr-4 text-xs font-mono break-all max-w-[120px]">${order.ID_Pedido}</td>
+        <td class="py-4 pr-4 text-sm">${order.payment_method}</td>
+        <td class="py-4 pr-4 text-sm whitespace-nowrap">${order.date} ${order.time}</td>
+        <td class="py-4 pr-4 text-sm font-semibold text-green-600">R$ ${order.total.toFixed(2)}</td>
+        <td class="py-4 pr-4 min-w-[220px] max-w-[320px] break-words">
+          ${observacoesCell}
+          <div class="flex gap-2 button-group">
+            <form action="/aceitar_pedido/${order.ID_Pedido}" method="post" class="flex-1">
+              <button type="submit" class="w-full px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium transition-colors">
+                ✓ Aceitar
+              </button>
+            </form>
+            <form action="/recusar_pedido/${order.ID_Pedido}" method="post" class="flex-1">
+              <button type="submit" class="w-full px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-medium transition-colors">
+                ✗ Recusar
+              </button>
+            </form>
+          </div>
         </td>
       `;
 
@@ -191,8 +209,13 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(indicator);
   }
 
-  // Inicializar auto-refresh
+  // Inicializar auto-refresh (DESABILITADO temporariamente)
   function startAutoRefresh() {
+    if (!autoRefreshEnabled) {
+      console.log("Auto-refresh desabilitado para preservar funcionalidade de observações");
+      return;
+    }
+    
     console.log("Iniciando monitoramento de pedidos a cada 8 segundos...");
 
     // Fazer primeira verificação após 2 segundos para carregar a tabela
