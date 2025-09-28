@@ -1,11 +1,3 @@
--- ===============================================================
--- FUNCIONALIDADES AVANÇADAS DO SISTEMA FOODERAMA
--- Arquivo: funcionalidades_fooderama.sql
--- Criado em: 01/09/2025
--- Descrição: Triggers, funções e procedimentos para o sistema
--- ===============================================================
-
-
 
 -- ===============================================================
 -- TRIGGERS DE VALIDAÇÃO
@@ -148,11 +140,6 @@ BEGIN
 END //
 
 DELIMITER;
-
--- ===============================================================
--- STORED PROCEDURES
--- ===============================================================
-
 DELIMITER //
 
 -- ---------------------------------------------------------------
@@ -231,8 +218,6 @@ DELIMITER ;
 
 -- ===============================================================
 -- TRIGGER PARA CONTROLE AUTOMÁTICO DE DISPONIBILIDADE POR ESTOQUE
--- Data: 28/09/2025
--- Descrição: Atualiza automaticamente StatusDisponibilidade baseado no estoque
 -- ===============================================================
 
 DELIMITER //
