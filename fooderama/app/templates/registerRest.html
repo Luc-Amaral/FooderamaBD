@@ -1,36 +1,69 @@
 {% extends 'base.html' %} {% block conteudo %}
 
-<form class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8"
-  action="{{ url_for('auth.register_restaurante') }}" method="POST">
-  <div class="sm:mx-auto sm:w-full sm:max-w-sm bg-white shadow-lg rounded-lg p-6">
+<form
+  class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8"
+  action="{{ url_for('auth.register_restaurante') }}"
+  method="POST"
+>
+  <div
+    class="sm:mx-auto sm:w-full sm:max-w-sm bg-white shadow-lg rounded-lg p-6"
+  >
     <div class="border-b border-gray-900/10 pb-12">
       <h2 class="text-2xl font-semibold text-gray-900">Informações Gerais</h2>
 
       <div class="mt-10 flex flex-col gap-y-8">
         <!-- Email Field -->
         <div class="flex flex-col">
-          <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>
+          <label for="email" class="block text-sm/6 font-medium text-gray-900"
+            >Email</label
+          >
           <div class="mt-2">
-            <input name="email" id="email" required autocomplete="email"
-              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6" />
+            <input
+              name="email"
+              id="email"
+              required
+              autocomplete="email"
+              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6"
+            />
           </div>
         </div>
 
         <!-- Password Field -->
         <div class="flex flex-col">
-          <label for="password" class="block text-sm/6 font-medium text-gray-900">Senha</label>
+          <label
+            for="password"
+            class="block text-sm/6 font-medium text-gray-900"
+            >Senha</label
+          >
           <div class="mt-2">
-            <input type="password" name="password" id="password" required autocomplete="current-password"
-              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6" />
+            <input
+              type="password"
+              name="password"
+              id="password"
+              required
+              autocomplete="current-password"
+              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6"
+            />
           </div>
         </div>
 
         <!-- Phone Field -->
         <div class="flex flex-col">
-          <label for="phone" class="block text-sm/6 font-medium text-gray-900">Telefone</label>
+          <label for="phone" class="block text-sm/6 font-medium text-gray-900"
+            >Telefone</label
+          >
           <div class="mt-2">
-            <input type="tel" name="phone" id="phone" required autocomplete="tel"
-              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6" />
+            <input
+              type="tel"
+              name="phone"
+              id="phone"
+              required
+              autocomplete="tel"
+              maxlength="9"
+              pattern="[0-9]{9}"
+              placeholder="999999999"
+              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6"
+            />
           </div>
         </div>
 
@@ -38,34 +71,65 @@
         <h3 class="text-lg font-semibold text-gray-900">Endereço</h3>
 
         <div class="flex flex-col">
-          <label for="street" class="block text-sm font-medium text-gray-900">Rua</label>
+          <label for="street" class="block text-sm font-medium text-gray-900"
+            >Rua</label
+          >
           <div class="mt-2">
-            <input type="text" id="street" name="street" required
-              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+            <input
+              type="text"
+              id="street"
+              name="street"
+              required
+              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+            />
           </div>
         </div>
 
         <div class="flex flex-col">
-          <label for="neighborhood" class="block text-sm font-medium text-gray-900">Bairro</label>
+          <label
+            for="neighborhood"
+            class="block text-sm font-medium text-gray-900"
+            >Bairro</label
+          >
           <div class="mt-2">
-            <input type="text" id="neighborhood" name="neighborhood" required
-              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+            <input
+              type="text"
+              id="neighborhood"
+              name="neighborhood"
+              required
+              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+            />
           </div>
         </div>
 
         <div class="flex gap-x-8">
           <div class="flex flex-col w-1/2">
-            <label for="number" class="block text-sm font-medium text-gray-900">Número</label>
+            <label for="number" class="block text-sm font-medium text-gray-900"
+              >Número</label
+            >
             <div class="mt-2">
-              <input type="text" id="number" name="number" required
-                class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="text"
+                id="number"
+                name="number"
+                required
+                class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
             </div>
           </div>
           <div class="flex flex-col w-1/2">
-            <label for="cep" class="block text-sm font-medium text-gray-900">CEP</label>
+            <label for="cep" class="block text-sm font-medium text-gray-900"
+              >CEP</label
+            >
             <div class="mt-2">
-              <input type="text" id="cep" name="cep" required maxlength="8"
-                class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="text"
+                id="cep"
+                name="cep"
+                required
+                maxlength="8"
+                class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
             </div>
           </div>
         </div>
@@ -80,10 +144,20 @@
       <div class="mt-10 flex flex-col gap-y-8">
         <!-- Restaurant Name Field -->
         <div class="flex flex-col">
-          <label for="name-restaurant" class="block text-sm/6 font-medium text-gray-900">Nome do Restaurante</label>
+          <label
+            for="name-restaurant"
+            class="block text-sm/6 font-medium text-gray-900"
+            >Nome do Restaurante</label
+          >
           <div class="mt-2">
-            <input type="text" name="name-restaurant" id="name-restaurant" required autocomplete="given-name"
-              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6" />
+            <input
+              type="text"
+              name="name-restaurant"
+              id="name-restaurant"
+              required
+              autocomplete="given-name"
+              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6"
+            />
           </div>
         </div>
 
@@ -95,99 +169,218 @@
 
           <!-- Segunda-feira -->
           <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Segunda-feira</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Segunda-feira</label
+            >
             <div class="flex items-center gap-4">
-              <input type="checkbox" name="segunda_ativo" id="segunda_ativo" class="mr-2" />
+              <input
+                type="checkbox"
+                name="segunda_ativo"
+                id="segunda_ativo"
+                class="mr-2"
+              />
               <span class="text-sm text-gray-600 mr-2">Ativo</span>
-              <input type="time" name="segunda_abertura" id="segunda_abertura" value="08:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="segunda_abertura"
+                id="segunda_abertura"
+                value="08:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
               <span class="text-gray-500">às</span>
-              <input type="time" name="segunda_fechamento" id="segunda_fechamento" value="18:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="segunda_fechamento"
+                id="segunda_fechamento"
+                value="18:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
             </div>
           </div>
 
           <!-- Terça-feira -->
           <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Terça-feira</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Terça-feira</label
+            >
             <div class="flex items-center gap-4">
-              <input type="checkbox" name="terca_ativo" id="terca_ativo" class="mr-2" />
+              <input
+                type="checkbox"
+                name="terca_ativo"
+                id="terca_ativo"
+                class="mr-2"
+              />
               <span class="text-sm text-gray-600 mr-2">Ativo</span>
-              <input type="time" name="terca_abertura" id="terca_abertura" value="08:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="terca_abertura"
+                id="terca_abertura"
+                value="08:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
               <span class="text-gray-500">às</span>
-              <input type="time" name="terca_fechamento" id="terca_fechamento" value="18:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="terca_fechamento"
+                id="terca_fechamento"
+                value="18:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
             </div>
           </div>
 
           <!-- Quarta-feira -->
           <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Quarta-feira</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Quarta-feira</label
+            >
             <div class="flex items-center gap-4">
-              <input type="checkbox" name="quarta_ativo" id="quarta_ativo" class="mr-2" />
+              <input
+                type="checkbox"
+                name="quarta_ativo"
+                id="quarta_ativo"
+                class="mr-2"
+              />
               <span class="text-sm text-gray-600 mr-2">Ativo</span>
-              <input type="time" name="quarta_abertura" id="quarta_abertura" value="08:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="quarta_abertura"
+                id="quarta_abertura"
+                value="08:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
               <span class="text-gray-500">às</span>
-              <input type="time" name="quarta_fechamento" id="quarta_fechamento" value="18:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="quarta_fechamento"
+                id="quarta_fechamento"
+                value="18:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
             </div>
           </div>
 
           <!-- Quinta-feira -->
           <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Quinta-feira</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Quinta-feira</label
+            >
             <div class="flex items-center gap-4">
-              <input type="checkbox" name="quinta_ativo" id="quinta_ativo" class="mr-2" />
+              <input
+                type="checkbox"
+                name="quinta_ativo"
+                id="quinta_ativo"
+                class="mr-2"
+              />
               <span class="text-sm text-gray-600 mr-2">Ativo</span>
-              <input type="time" name="quinta_abertura" id="quinta_abertura" value="08:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="quinta_abertura"
+                id="quinta_abertura"
+                value="08:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
               <span class="text-gray-500">às</span>
-              <input type="time" name="quinta_fechamento" id="quinta_fechamento" value="18:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="quinta_fechamento"
+                id="quinta_fechamento"
+                value="18:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
             </div>
           </div>
 
           <!-- Sexta-feira -->
           <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Sexta-feira</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Sexta-feira</label
+            >
             <div class="flex items-center gap-4">
-              <input type="checkbox" name="sexta_ativo" id="sexta_ativo" class="mr-2" />
+              <input
+                type="checkbox"
+                name="sexta_ativo"
+                id="sexta_ativo"
+                class="mr-2"
+              />
               <span class="text-sm text-gray-600 mr-2">Ativo</span>
-              <input type="time" name="sexta_abertura" id="sexta_abertura" value="08:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="sexta_abertura"
+                id="sexta_abertura"
+                value="08:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
               <span class="text-gray-500">às</span>
-              <input type="time" name="sexta_fechamento" id="sexta_fechamento" value="18:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="sexta_fechamento"
+                id="sexta_fechamento"
+                value="18:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
             </div>
           </div>
 
           <!-- Sábado -->
           <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Sábado</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Sábado</label
+            >
             <div class="flex items-center gap-4">
-              <input type="checkbox" name="sabado_ativo" id="sabado_ativo" class="mr-2" />
+              <input
+                type="checkbox"
+                name="sabado_ativo"
+                id="sabado_ativo"
+                class="mr-2"
+              />
               <span class="text-sm text-gray-600 mr-2">Ativo</span>
-              <input type="time" name="sabado_abertura" id="sabado_abertura" value="08:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="sabado_abertura"
+                id="sabado_abertura"
+                value="08:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
               <span class="text-gray-500">às</span>
-              <input type="time" name="sabado_fechamento" id="sabado_fechamento" value="18:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="sabado_fechamento"
+                id="sabado_fechamento"
+                value="18:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
             </div>
           </div>
 
           <!-- Domingo -->
           <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Domingo</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Domingo</label
+            >
             <div class="flex items-center gap-4">
-              <input type="checkbox" name="domingo_ativo" id="domingo_ativo" class="mr-2" />
+              <input
+                type="checkbox"
+                name="domingo_ativo"
+                id="domingo_ativo"
+                class="mr-2"
+              />
               <span class="text-sm text-gray-600 mr-2">Ativo</span>
-              <input type="time" name="domingo_abertura" id="domingo_abertura" value="08:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="domingo_abertura"
+                id="domingo_abertura"
+                value="08:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
               <span class="text-gray-500">às</span>
-              <input type="time" name="domingo_fechamento" id="domingo_fechamento" value="18:00"
-                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm" />
+              <input
+                type="time"
+                name="domingo_fechamento"
+                id="domingo_fechamento"
+                value="18:00"
+                class="pl-2 block w-24 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
+              />
             </div>
           </div>
         </div>
@@ -195,11 +388,17 @@
     </div>
 
     <div class="mt-6 flex items-center gap-x-6">
-      <button type="button" id="cancelButton" class="text-sm/6 font-semibold text-gray-900">
+      <button
+        type="button"
+        id="cancelButton"
+        class="text-sm/6 font-semibold text-gray-900"
+      >
         Cancel
       </button>
-      <button type="submit"
-        class="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800">
+      <button
+        type="submit"
+        class="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800"
+      >
         Save
       </button>
     </div>

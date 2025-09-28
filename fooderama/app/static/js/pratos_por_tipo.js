@@ -13,7 +13,8 @@ function abrirModalPrato(
   descricao,
   preco,
   estoque,
-  nomeRestaurante
+  nomeRestaurante,
+  tipoPrato = ""
 ) {
   currentPrato = {
     id: id,
@@ -23,6 +24,7 @@ function abrirModalPrato(
     preco: preco,
     estoque: estoque,
     nomeRestaurante: nomeRestaurante,
+    tipoPrato: tipoPrato,
   };
 
   // Preencher dados no modal
@@ -45,6 +47,28 @@ function abrirModalPrato(
   const quantidadeInput = document.getElementById("modalQuantidade");
   quantidadeInput.max = estoque;
   quantidadeInput.value = 1;
+
+  // Carregar imagem do prato no modal - REPLICANDO DO RESTAURANT_NEW.JS
+  console.log("DEBUG: Tentando carregar imagem");
+  console.log("DEBUG: window.FoodImageAPI:", window.FoodImageAPI);
+  console.log("DEBUG: tipoPrato:", tipoPrato);
+
+  if (window.FoodImageAPI && tipoPrato) {
+    const modalImage = document.getElementById("modalPratoImagem");
+    console.log("DEBUG: modalImage encontrada:", modalImage);
+    window.FoodImageAPI.loadFoodImage(
+      tipoPrato.toLowerCase(),
+      nome,
+      modalImage
+    );
+  } else {
+    console.log(
+      "DEBUG: Falhou na condição - FoodImageAPI:",
+      !!window.FoodImageAPI,
+      "tipoPrato:",
+      tipoPrato
+    );
+  }
 
   // Mostrar modal
   document.getElementById("prato-modal").classList.remove("hidden");

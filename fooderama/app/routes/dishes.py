@@ -11,7 +11,12 @@ def cadastrar_comida():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)  # Use `dictionary=True` para retornar um dicionário
 
-    cursor.execute("SELECT * FROM prato WHERE ID_Restaurante_FK = %s", (current_user.id,))
+    cursor.execute("""
+        SELECT p.*, tp.Tipo as TipoPrato 
+        FROM prato p 
+        JOIN tipo_prato tp ON p.ID_TipoPrato_FK = tp.ID_TipoPrato 
+        WHERE p.ID_Restaurante_FK = %s
+    """, (current_user.id,))
     prato = cursor.fetchall()
 
     cursor.execute("SELECT * FROM restaurante WHERE ID_Restaurante = %s", (current_user.id,))
