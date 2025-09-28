@@ -2,7 +2,7 @@
 {% block conteudo %}
 <div class="flex flex-col bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-12">
     <h2 class="text-2xl font-semibold text-gray-900 text-left border-b border-gray-900/10 pb-4">Cadastrar Endereço</h2>
-    <form action="/cadastrar_endereco" method="POST" class="mt-6 flex flex-col gap-4">
+    <form action="{{ url_for('orders.cadastrar_endereco') }}" method="POST" class="mt-6 flex flex-col gap-4">
         <div class="flex flex-col">
             <!-- Tópico principal: Endereço -->
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Endereço</h3>
@@ -50,20 +50,21 @@
     <h2 class="text-2xl font-semibold text-gray-900 text-left pb-4">Endereços Cadastrados</h2>
     <div class="mt-6 flex flex-col gap-4">
         {% for address in addresses %}
-<div class="flex flex-col gap-2 border-t">
-    <div class="flex items-center justify-between mt-2">
-        <h3 class="text-lg font-semibold text-gray-900">{{ address.rua }}</h3>
-    </div>
-    <p class="text-sm text-gray-600">Bairro: {{ address.bairro }}</p>
-    <p class="text-sm text-gray-600">Número: {{ address.numero }}</p>
-    <div class="flex items-center justify-between">
-        <p class="text-sm text-gray-600">CEP: {{ address.cep }}</p>
-        <form action="/alterar_endereco/{{ address.id }}" method="POST">
-            <button type="submit" class="text-sm font-medium text-blue-500 hover:text-blue-700">Escolher</button>
-        </form>
-    </div>
-</div>
-{% endfor %}
+        <div class="flex flex-col gap-2 border-t">
+            <div class="flex items-center justify-between mt-2">
+                <h3 class="text-lg font-semibold text-gray-900">{{ address.rua }}</h3>
+            </div>
+            <p class="text-sm text-gray-600">Bairro: {{ address.bairro }}</p>
+            <p class="text-sm text-gray-600">Número: {{ address.numero }}</p>
+            <div class="flex items-center justify-between">
+                <p class="text-sm text-gray-600">CEP: {{ address.cep }}</p>
+                <form action="{{ url_for('orders.alterar_endereco', endereco_id=address.id) }}" method="POST">
+                    <button type="submit"
+                        class="text-sm font-medium text-blue-500 hover:text-blue-700">Escolher</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 
