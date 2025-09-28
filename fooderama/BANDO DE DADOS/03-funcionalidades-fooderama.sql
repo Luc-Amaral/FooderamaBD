@@ -228,3 +228,28 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- ===============================================================
+-- TRIGGER PARA CONTROLE AUTOMÁTICO DE DISPONIBILIDADE POR ESTOQUE
+-- Data: 28/09/2025
+-- Descrição: Atualiza automaticamente StatusDisponibilidade baseado no estoque
+-- ===============================================================
+
+DELIMITER //
+
+CREATE TRIGGER tr_atualizar_status_por_estoque
+BEFORE UPDATE ON prato
+FOR EACH ROW
+BEGIN
+    -- Se o estoque chegou a 0, desativar o prato
+    IF NEW.Estoque = 0 THEN
+        SET NEW.StatusDisponibilidade = 0;
+    END IF;
+    
+    -- Se o estoque voltou a ser > 0 e o prato estava inativo por estoque, reativar
+    IF NEW.Estoque > 0 AND OLD.Estoque = 0 AND OLD.StatusDisponibilidade = 0 THEN
+        SET NEW.StatusDisponibilidade = 1;
+    END IF;
+END//
+
+DELIMITER ;

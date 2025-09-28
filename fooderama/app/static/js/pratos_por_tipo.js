@@ -5,6 +5,95 @@ let enderecos = [];
 let currentPrato = null;
 let selectedPaymentMethod = null;
 
+// Função para abrir modal do prato
+function abrirModalPrato(
+  id,
+  restauranteId,
+  nome,
+  descricao,
+  preco,
+  estoque,
+  nomeRestaurante
+) {
+  currentPrato = {
+    id: id,
+    restauranteId: restauranteId,
+    nome: nome,
+    descricao: descricao,
+    preco: preco,
+    estoque: estoque,
+    nomeRestaurante: nomeRestaurante,
+  };
+
+  // Preencher dados no modal
+  document.getElementById("modalPratoNome").textContent = nome;
+  document.getElementById("modalPratoNome2").textContent = nome;
+  document.getElementById("modalPratoDescricao").textContent = descricao;
+  document.getElementById("modalPratoPreco").textContent = `R$ ${preco.toFixed(
+    2
+  )}`;
+  document.getElementById("modalPratoRestaurante").textContent =
+    nomeRestaurante;
+
+  // Exibir estoque no modal
+  const estoqueElement = document.getElementById("modalPratoEstoque");
+  if (estoqueElement) {
+    estoqueElement.textContent = `Estoque disponível: ${estoque}`;
+  }
+
+  // Configurar quantidade máxima baseada no estoque
+  const quantidadeInput = document.getElementById("modalQuantidade");
+  quantidadeInput.max = estoque;
+  quantidadeInput.value = 1;
+
+  // Mostrar modal
+  document.getElementById("prato-modal").classList.remove("hidden");
+
+  // Atualizar valor total inicial
+  atualizarValorTotal();
+}
+
+// Função para fechar modal do prato
+function fecharModalPrato() {
+  document.getElementById("prato-modal").classList.add("hidden");
+  currentPrato = null;
+}
+
+// Funções para controlar quantidade
+function diminuirQuantidade() {
+  const input = document.getElementById("modalQuantidade");
+  if (input.value > 1) {
+    input.value = parseInt(input.value) - 1;
+    atualizarValorTotal();
+  }
+}
+
+function aumentarQuantidade() {
+  const input = document.getElementById("modalQuantidade");
+  const quantidade = parseInt(input.value);
+
+  if (quantidade < currentPrato.estoque) {
+    input.value = quantidade + 1;
+    atualizarValorTotal();
+  } else {
+    alert(`Estoque insuficiente! Disponível: ${currentPrato.estoque} unidades`);
+  }
+}
+
+// Função para atualizar valor total do modal
+function atualizarValorTotal() {
+  if (currentPrato) {
+    const quantidade = parseInt(
+      document.getElementById("modalQuantidade").value
+    );
+    const total = currentPrato.preco * quantidade;
+    const totalElement = document.getElementById("modalValorTotal");
+    if (totalElement) {
+      totalElement.textContent = `Total: R$ ${total.toFixed(2)}`;
+    }
+  }
+}
+
 // Carregar endereços do usuário
 async function carregarEnderecos() {
   try {
@@ -208,17 +297,33 @@ function adicionarAoCarrinho() {
   currentRestaurantId = currentPrato.restauranteId;
   const quantidade = parseInt(document.getElementById("modalQuantidade").value);
 
+  // Validar se a quantidade não excede o estoque
+  if (quantidade > currentPrato.estoque) {
+    alert(
+      `Quantidade solicitada (${quantidade}) excede o estoque disponível (${currentPrato.estoque})`
+    );
+    return;
+  }
+
   // Verificar se o item já está no carrinho
   const existingItem = cart.find((item) => item.id === currentPrato.id);
 
   if (existingItem) {
-    existingItem.quantidade += quantidade;
+    const novaQuantidade = existingItem.quantidade + quantidade;
+    if (novaQuantidade > currentPrato.estoque) {
+      alert(
+        `Não é possível adicionar ${quantidade} unidades. Estoque disponível: ${currentPrato.estoque}. Você já tem ${existingItem.quantidade} no carrinho.`
+      );
+      return;
+    }
+    existingItem.quantidade = novaQuantidade;
   } else {
     cart.push({
       id: currentPrato.id,
       nome: currentPrato.nome,
       preco: currentPrato.preco,
       quantidade: quantidade,
+      estoque: currentPrato.estoque,
       nomeRestaurante: currentPrato.nomeRestaurante,
     });
   }

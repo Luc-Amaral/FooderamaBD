@@ -551,6 +551,7 @@ def setup_routes(app):
         status = request.form['status']
 
         # Convert status to appropriate value
+        # O trigger automaticamente ajustará StatusDisponibilidade baseado no estoque
         status_value = 1 if status == 'ativo' else 0
 
         # Generate a new UUID for the food item
@@ -604,6 +605,8 @@ def setup_routes(app):
             estoque = request.form['estoque']
             status = request.form['status']
 
+            # Convert status to appropriate value
+            # O trigger automaticamente ajustará StatusDisponibilidade baseado no estoque
             status_value = 1 if status == 'ativo' else 0
 
             # Atualizar os dados no banco de dados
@@ -934,16 +937,39 @@ def setup_routes(app):
         cursor = conn.cursor()
 
         try:
-            # Atualizar o status do pedido para 'ACEITO'
+            # Primeiro verificar se o pedido pertence ao restaurante
             cursor.execute("""
-                UPDATE pedido p
+                SELECT COUNT(*) as count
+                FROM pedido p
                 JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
                 JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
-                SET p.status = 'ACEITO'
                 WHERE p.ID_Pedido = %s AND pr.ID_Restaurante_FK = %s
             """, (pedido_id, current_user.id))
+            
+            result = cursor.fetchone()
+            if result[0] == 0:
+                flash('Pedido não encontrado ou você não tem permissão para aceitá-lo.', 'danger')
+                return redirect(url_for('historico_rest'))
+            
+            # Atualizar apenas o status do pedido (sem JOIN com prato)
+            cursor.execute("""
+                UPDATE pedido 
+                SET status = 'ACEITO'
+                WHERE ID_Pedido = %s
+            """, (pedido_id,))
+            
+            # Decrementar estoque diretamente com SQL
+            # O trigger automaticamente atualizará StatusDisponibilidade = 0 se estoque chegar a 0
+            cursor.execute("""
+                UPDATE prato p
+                JOIN item i ON p.ID_Prato = i.ID_Prato_FK
+                SET p.Estoque = p.Estoque - i.quantidade
+                WHERE i.ID_Pedido_FK = %s AND p.Estoque >= i.quantidade
+            """, (pedido_id,))
+            
             conn.commit()
             flash('Pedido aceito com sucesso.', 'success')
+            
         except Exception as e:
             conn.rollback()
             flash(f'Erro ao aceitar o pedido: {str(e)}', 'danger')
@@ -1035,10 +1061,14 @@ def setup_routes(app):
 
         # Calcular o valor total de cada pedido histórico e subtrair 3%
         for order in historical_orders:
-            cursor.execute("CALL calcular_total_pedido(%s, @total)", (order['ID_Pedido'],))
-            cursor.execute("SELECT @total AS total")
+            cursor.execute("""
+                SELECT ROUND(SUM(pr.Preco * i.Quantidade), 2) as total
+                FROM item i
+                JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+                WHERE i.ID_Pedido_FK = %s
+            """, (order['ID_Pedido'],))
             total_result = cursor.fetchone()
-            order['total'] = total_result['total'] * 0.97 if total_result['total'] else 0  # Subtrair 3%
+            order['total'] = round(total_result['total'] * 0.97, 2) if total_result['total'] else 0  # Subtrair 3%
 
         cursor.close()
         conn.close()
@@ -1199,8 +1229,12 @@ def setup_routes(app):
 
         # Calcular o valor total de cada pedido
         for order in orders:
-            cursor.execute("CALL calcular_total_pedido(%s, @total)", (order['ID_Pedido'],))
-            cursor.execute("SELECT @total AS total")
+            cursor.execute("""
+                SELECT ROUND(SUM(pr.Preco * i.Quantidade), 2) as total
+                FROM item i
+                JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+                WHERE i.ID_Pedido_FK = %s
+            """, (order['ID_Pedido'],))
             total_result = cursor.fetchone()
             order['total'] = total_result['total'] if total_result['total'] else 0
 

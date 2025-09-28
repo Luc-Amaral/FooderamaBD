@@ -141,6 +141,10 @@
           <span class="text-sm font-medium text-gray-500"
             >R$ {{ '%.2f'|format(food.Preco) }}</span
           >
+          <span
+            class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full"
+            >Estoque: {{ food.Estoque }}</span
+          >
         </div>
       </div>
       <p class="text-sm text-gray-600">{{ food.Descricao }}</p>
