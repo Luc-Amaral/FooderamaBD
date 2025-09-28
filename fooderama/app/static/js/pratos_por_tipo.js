@@ -5,6 +5,9 @@ let enderecos = [];
 let currentPrato = null;
 let selectedPaymentMethod = null;
 
+// Teste de carregamento
+console.log("DEBUG: pratos_por_tipo.js carregado");
+
 // Função para abrir modal do prato
 function abrirModalPrato(
   id,
