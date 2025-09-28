@@ -478,21 +478,45 @@ def setup_routes(app):
         cursor.execute("SELECT * FROM restaurante WHERE ID_Restaurante = %s", (restaurant_id,))
         restaurante = cursor.fetchone()
 
+        # Buscar horários de funcionamento
         cursor.execute("""
-            SELECT e.*
-            FROM endereco e
-            JOIN endereco_cliente ec ON e.ID_Endereco = ec.ID_Endereco_FK
-            WHERE ec.ID_Cliente_FK = %s
-            ORDER BY ec.Data_Atualizacao DESC
-        """, (current_user.id,))
+            SELECT DiaSemana, HoraAbertura, HoraFechamento, Status
+            FROM horafuncionamento 
+            WHERE ID_Restaurante_FK = %s
+            ORDER BY FIELD(DiaSemana, 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo')
+        """, (restaurant_id,))
+        horarios_funcionamento = cursor.fetchall()
 
-        enderecos = cursor.fetchall()
-        print(f"DEBUG: Enderecos encontrados para cliente {current_user.id}: {enderecos}")
+        # Converter time objects para string
+        for horario in horarios_funcionamento:
+            if horario['HoraAbertura']:
+                horario['HoraAbertura'] = str(horario['HoraAbertura'])
+            if horario['HoraFechamento']:
+                horario['HoraFechamento'] = str(horario['HoraFechamento'])
+
+        # Buscar endereços apenas se o usuário estiver logado
+        enderecos = []
+        if current_user.is_authenticated:
+            cursor.execute("""
+                SELECT e.*
+                FROM endereco e
+                JOIN endereco_cliente ec ON e.ID_Endereco = ec.ID_Endereco_FK
+                WHERE ec.ID_Cliente_FK = %s
+                ORDER BY ec.Data_Atualizacao DESC
+            """, (current_user.id,))
+            enderecos = cursor.fetchall()
+            print(f"DEBUG: Enderecos encontrados para cliente {current_user.id}: {enderecos}")
 
         cursor.close()
         conn.close()
 
-        return render_template('restaurant.html', pratos=pratos, restaurante=restaurante, food_type=food_type, enderecos=enderecos)
+        return render_template('restaurant.html', pratos=pratos, restaurante=restaurante, food_type=food_type, enderecos=enderecos, horarios_funcionamento=horarios_funcionamento)
+
+    @app.route('/restaurant/<restaurant_id>')
+    @login_required
+    def restaurant_by_id(restaurant_id):
+        """Rota alternativa para acessar restaurante por ID na URL"""
+        return redirect(url_for('restaurant', restaurant_id=restaurant_id))
 
     @app.route('/api/enderecos')
     @login_required
@@ -538,6 +562,108 @@ def setup_routes(app):
         conn.close()
 
         return render_template('cadastrar_comida.html', prato=prato, restaurante=restaurante, tipos_prato=tipos_prato)
+
+    @app.route('/editarHorario')
+    @login_required
+    def editarHorario():
+        """Página para editar horários de funcionamento do restaurante"""
+        # Verificar se é um restaurante
+        if current_user.is_client:
+            flash('Acesso negado. Apenas restaurantes podem editar horários.', 'error')
+            return redirect(url_for('index'))
+        
+        return render_template('editarHorario.html')
+    
+    @app.route('/api/horarios/<restaurante_id>')
+    def get_horarios(restaurante_id):
+        """Busca os horários de funcionamento de um restaurante"""
+        try:
+            print(f"DEBUG: Buscando horários para restaurante {restaurante_id}")
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            
+            cursor.execute("""
+                SELECT DiaSemana, HoraAbertura, HoraFechamento, Status
+                FROM horafuncionamento 
+                WHERE ID_Restaurante_FK = %s
+                ORDER BY FIELD(DiaSemana, 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo')
+            """, (restaurante_id,))
+            
+            horarios = cursor.fetchall()
+            print(f"DEBUG: Horários encontrados: {horarios}")
+            
+            # Converter time objects para string
+            for horario in horarios:
+                if horario['HoraAbertura']:
+                    horario['HoraAbertura'] = str(horario['HoraAbertura'])
+                if horario['HoraFechamento']:
+                    horario['HoraFechamento'] = str(horario['HoraFechamento'])
+            
+            print(f"DEBUG: Retornando horários: {horarios}")
+            return jsonify(horarios)
+            
+        except Exception as e:
+            print(f"Erro ao buscar horários: {str(e)}")
+            return jsonify({'error': str(e)}), 500
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+    
+    @app.route('/api/salvar_horarios', methods=['POST'])
+    def salvar_horarios():
+        """Salva os horários de funcionamento de um restaurante"""
+        try:
+            print("DEBUG: Recebendo dados para salvar horários")
+            data = request.get_json()
+            print(f"DEBUG: Dados recebidos: {data}")
+            
+            restaurante_id = data.get('restaurante_id')
+            horarios = data.get('horarios')
+            
+            print(f"DEBUG: Restaurante ID: {restaurante_id}")
+            print(f"DEBUG: Horários: {horarios}")
+            
+            # TODO: Adicionar verificação de segurança depois
+            # Verificar se o usuário é o dono do restaurante
+            # if not hasattr(current_user, 'is_client') or current_user.is_client:
+            #     return jsonify({'error': 'Acesso negado'}), 403
+            # 
+            # if current_user.id != restaurante_id:
+            #     return jsonify({'error': 'Você só pode editar os horários do seu próprio restaurante'}), 403
+            
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Primeiro, deletar todos os horários existentes do restaurante
+            print("DEBUG: Deletando horários existentes")
+            cursor.execute("DELETE FROM horafuncionamento WHERE ID_Restaurante_FK = %s", (restaurante_id,))
+            
+            # Inserir os novos horários
+            print("DEBUG: Inserindo novos horários")
+            for horario in horarios:
+                id_hora_funcionamento = str(uuid.uuid4())
+                print(f"DEBUG: Inserindo horário: {horario}")
+                cursor.execute("""
+                    INSERT INTO horafuncionamento (ID_HoraFuncionamento, ID_Restaurante_FK, DiaSemana, HoraAbertura, HoraFechamento, Status)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (id_hora_funcionamento, restaurante_id, horario['dia'], horario['abertura'], horario['fechamento'], horario['status']))
+            
+            conn.commit()
+            print("DEBUG: Horários salvos com sucesso")
+            return jsonify({'success': True, 'message': 'Horários salvos com sucesso!'})
+            
+        except Exception as e:
+            print(f"Erro ao salvar horários: {str(e)}")
+            if 'conn' in locals():
+                conn.rollback()
+            return jsonify({'error': str(e)}), 500
+        finally:
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+            if 'conn' in locals() and conn:
+                conn.close()
     
     @app.route('/submit_food', methods=['POST'])
     @login_required

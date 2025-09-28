@@ -157,26 +157,3 @@ ON prato (Estoque, StatusDisponibilidade);
 CREATE INDEX idx_item_pedido_prato 
 ON item (ID_Pedido_FK, ID_Prato_FK);
 
--- ===============================================================
--- COMENTÁRIOS E DOCUMENTAÇÃO
--- ===============================================================
-
-/*
-NÍVEL DE ISOLAMENTO READ COMMITTED:
-- Previne leituras sujas (dirty reads)
-- Permite leituras não-repetíveis (non-repeatable reads)
-- Balanceia consistência com performance
-- Adequado para aplicações web com alta concorrência
-
-ESTRATÉGIAS DE LOCK IMPLEMENTADAS:
-1. SELECT FOR UPDATE: Lock pessimista em registros críticos
-2. SELECT LOCK IN SHARE MODE: Lock compartilhado para leituras
-3. Verificação dupla de estoque (antes e durante atualização)
-4. Timeout configurado para evitar locks infinitos
-
-PROTEÇÕES CONTRA RACE CONDITIONS:
-- Verificação de status do pedido com lock
-- Atualização atômica de estoque
-- Rollback automático em caso de erro
-- Validação de ROW_COUNT() após UPDATE
-*/

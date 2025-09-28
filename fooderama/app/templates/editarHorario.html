@@ -1,0 +1,363 @@
+{% extends 'base.html' %} {% block conteudo %}
+
+<div class="min-h-screen bg-gray-100 py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">
+            Editar Horários de Funcionamento
+          </h1>
+          <p class="text-gray-600 mt-1">
+            Configure os horários de funcionamento do seu restaurante
+          </p>
+        </div>
+        <button
+          onclick="voltarParaRestaurante()"
+          class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium"
+        >
+          Voltar
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulário de Horários -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <form id="horario-form">
+        <div class="space-y-6">
+          <!-- Segunda-feira -->
+          <div class="border-b border-gray-200 pb-6">
+            <label class="block text-lg font-medium text-gray-700 mb-3"
+              >Segunda-feira</label
+            >
+            <div class="flex items-center gap-6">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="segunda_ativo"
+                  id="segunda_ativo"
+                  class="mr-3 h-4 w-4 text-blue-600"
+                />
+                <span class="text-gray-700 font-medium">Aberto</span>
+              </label>
+              <div class="flex items-center gap-4">
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Abertura</label
+                  >
+                  <input
+                    type="time"
+                    name="segunda_abertura"
+                    id="segunda_abertura"
+                    value="08:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Fechamento</label
+                  >
+                  <input
+                    type="time"
+                    name="segunda_fechamento"
+                    id="segunda_fechamento"
+                    value="18:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Terça-feira -->
+          <div class="border-b border-gray-200 pb-6">
+            <label class="block text-lg font-medium text-gray-700 mb-3"
+              >Terça-feira</label
+            >
+            <div class="flex items-center gap-6">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="terca_ativo"
+                  id="terca_ativo"
+                  class="mr-3 h-4 w-4 text-blue-600"
+                />
+                <span class="text-gray-700 font-medium">Aberto</span>
+              </label>
+              <div class="flex items-center gap-4">
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Abertura</label
+                  >
+                  <input
+                    type="time"
+                    name="terca_abertura"
+                    id="terca_abertura"
+                    value="08:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Fechamento</label
+                  >
+                  <input
+                    type="time"
+                    name="terca_fechamento"
+                    id="terca_fechamento"
+                    value="18:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quarta-feira -->
+          <div class="border-b border-gray-200 pb-6">
+            <label class="block text-lg font-medium text-gray-700 mb-3"
+              >Quarta-feira</label
+            >
+            <div class="flex items-center gap-6">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="quarta_ativo"
+                  id="quarta_ativo"
+                  class="mr-3 h-4 w-4 text-blue-600"
+                />
+                <span class="text-gray-700 font-medium">Aberto</span>
+              </label>
+              <div class="flex items-center gap-4">
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Abertura</label
+                  >
+                  <input
+                    type="time"
+                    name="quarta_abertura"
+                    id="quarta_abertura"
+                    value="08:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Fechamento</label
+                  >
+                  <input
+                    type="time"
+                    name="quarta_fechamento"
+                    id="quarta_fechamento"
+                    value="18:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quinta-feira -->
+          <div class="border-b border-gray-200 pb-6">
+            <label class="block text-lg font-medium text-gray-700 mb-3"
+              >Quinta-feira</label
+            >
+            <div class="flex items-center gap-6">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="quinta_ativo"
+                  id="quinta_ativo"
+                  class="mr-3 h-4 w-4 text-blue-600"
+                />
+                <span class="text-gray-700 font-medium">Aberto</span>
+              </label>
+              <div class="flex items-center gap-4">
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Abertura</label
+                  >
+                  <input
+                    type="time"
+                    name="quinta_abertura"
+                    id="quinta_abertura"
+                    value="08:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Fechamento</label
+                  >
+                  <input
+                    type="time"
+                    name="quinta_fechamento"
+                    id="quinta_fechamento"
+                    value="18:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sexta-feira -->
+          <div class="border-b border-gray-200 pb-6">
+            <label class="block text-lg font-medium text-gray-700 mb-3"
+              >Sexta-feira</label
+            >
+            <div class="flex items-center gap-6">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="sexta_ativo"
+                  id="sexta_ativo"
+                  class="mr-3 h-4 w-4 text-blue-600"
+                />
+                <span class="text-gray-700 font-medium">Aberto</span>
+              </label>
+              <div class="flex items-center gap-4">
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Abertura</label
+                  >
+                  <input
+                    type="time"
+                    name="sexta_abertura"
+                    id="sexta_abertura"
+                    value="08:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Fechamento</label
+                  >
+                  <input
+                    type="time"
+                    name="sexta_fechamento"
+                    id="sexta_fechamento"
+                    value="18:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sábado -->
+          <div class="border-b border-gray-200 pb-6">
+            <label class="block text-lg font-medium text-gray-700 mb-3"
+              >Sábado</label
+            >
+            <div class="flex items-center gap-6">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="sabado_ativo"
+                  id="sabado_ativo"
+                  class="mr-3 h-4 w-4 text-blue-600"
+                />
+                <span class="text-gray-700 font-medium">Aberto</span>
+              </label>
+              <div class="flex items-center gap-4">
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Abertura</label
+                  >
+                  <input
+                    type="time"
+                    name="sabado_abertura"
+                    id="sabado_abertura"
+                    value="08:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Fechamento</label
+                  >
+                  <input
+                    type="time"
+                    name="sabado_fechamento"
+                    id="sabado_fechamento"
+                    value="18:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Domingo -->
+          <div class="pb-6">
+            <label class="block text-lg font-medium text-gray-700 mb-3"
+              >Domingo</label
+            >
+            <div class="flex items-center gap-6">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="domingo_ativo"
+                  id="domingo_ativo"
+                  class="mr-3 h-4 w-4 text-blue-600"
+                />
+                <span class="text-gray-700 font-medium">Aberto</span>
+              </label>
+              <div class="flex items-center gap-4">
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Abertura</label
+                  >
+                  <input
+                    type="time"
+                    name="domingo_abertura"
+                    id="domingo_abertura"
+                    value="08:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-600 mb-1"
+                    >Fechamento</label
+                  >
+                  <input
+                    type="time"
+                    name="domingo_fechamento"
+                    id="domingo_fechamento"
+                    value="18:00"
+                    class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200">
+          <button
+            type="button"
+            onclick="voltarParaRestaurante()"
+            class="px-6 py-3 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 font-medium"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onclick="salvarHorarios()"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            id="salvar-btn"
+          >
+            Salvar Horários
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/editarHorario.js') }}"></script>
+
+{% endblock %}

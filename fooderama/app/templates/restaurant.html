@@ -12,6 +12,15 @@
         {{ restaurante.NomeRestaurante }}
       </h2>
       <div class="flex items-center gap-2">
+        {% if not current_user.is_client %}
+        <!-- Botão para editar horário (só aparece para restaurantes) -->
+        <a
+          href="/editarHorario?id={{ restaurante.ID_Restaurante }}"
+          class="text-sm font-semibold bg-black text-[#D2FF5A] rounded-md px-3.5 py-1.5 hover:bg-gray-800 active:bg-[#D2FF5A] active:text-black transition-colors duration-100"
+        >
+          Editar Horário
+        </a>
+        {% endif %}
         <a
           href="/feedback?restaurant_id={{ restaurante.ID_Restaurante }}"
           class="text-sm font-semibold bg-black text-[#D2FF5A] rounded-md px-3.5 py-1.5 hover:bg-gray-800 active:bg-[#D2FF5A] active:text-black transition-colors duration-100"
@@ -20,6 +29,42 @@
         </a>
       </div>
     </div>
+
+    <!-- Seção de Horário de Funcionamento (só aparece para clientes) -->
+    {% if current_user.is_client %}
+    <div class="mt-4 p-4 bg-gray-50 rounded-lg border">
+      <h3 class="text-lg font-semibold text-gray-800 mb-3">
+        Horário de Funcionamento
+      </h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+        {% set dias_semana = { 'Segunda': 'Segunda-feira', 'Terca':
+        'Terça-feira', 'Quarta': 'Quarta-feira', 'Quinta': 'Quinta-feira',
+        'Sexta': 'Sexta-feira', 'Sabado': 'Sábado', 'Domingo': 'Domingo' } %} {%
+        for horario in horarios_funcionamento %}
+        <div
+          class="flex flex-col items-center p-2 bg-white rounded-md shadow-sm"
+        >
+          <span class="font-medium text-gray-700 text-xs"
+            >{{ dias_semana[horario.DiaSemana] }}</span
+          >
+          {% if horario.Status == 1 %}
+          <span class="text-green-600 font-medium"
+            >{{ horario.HoraAbertura|format_time }} - {{
+            horario.HoraFechamento|format_time }}</span
+          >
+          {% else %}
+          <span class="text-red-500 font-medium">Fechado</span>
+          {% endif %}
+        </div>
+        {% endfor %} {% if not horarios_funcionamento %}
+        <div class="col-span-full text-center text-gray-500">
+          <span>Horários não informados</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
     <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
       <!-- Produtos com popup -->
       {% for prato in pratos %} {% if prato.StatusDisponibilidade == 1 %}
@@ -269,6 +314,7 @@
     </button>
   </div>
 </div>
+{% endif %}
 
 <script src="{{ url_for('static', filename='js/restaurant_new.js') }}"></script>
-{% endif %} {% endblock %}
+{% endblock %}
