@@ -1,16 +1,11 @@
 {% extends 'base.html' %} {% block conteudo %}
 <div class="flex flex-col py-2 px-4 lg:px-8 xl:px-16 max-w-4xl mx-auto">
   <div class="mt-10 flex flex-col gap-6 bg-white shadow-lg rounded-lg p-6">
-    <div
-      class="flex items-center justify-between border-b border-gray-900/10 pb-4"
-    >
+    <div class="flex items-center justify-between border-b border-gray-900/10 pb-4">
       <h2 class="text-2xl font-semibold text-gray-900 text-left">
         Pratos de {{ tipo }}
       </h2>
-      <a
-        href="/index"
-        class="text-orange-500 hover:text-orange-600 font-medium"
-      >
+      <a href="/index" class="text-orange-500 hover:text-orange-600 font-medium">
         ← Voltar ao início
       </a>
     </div>
@@ -21,16 +16,11 @@
     {% for prato in pratos %}
     <div
       class="group flex items-start border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-gray-300 transition-all duration-300 cursor-pointer bg-white"
-      onclick="abrirModalPrato('{{ prato.ID_Prato }}', '{{ prato.ID_Restaurante_FK }}', `{{ prato.Nome }}`, `{{ prato.Descricao }}`, {{ prato.Preco }}, {{ prato.Estoque }}, `{{ prato.NomeRestaurante }}`)"
-    >
-      <div
-        class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100"
-      >
-        <img
-          src="../static/images/fooderama.png"
-          alt="Prato"
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+      onclick="abrirModalPrato('{{ prato.ID_Prato }}', '{{ prato.ID_Restaurante_FK }}', `{{ prato.Nome }}`, `{{ prato.Descricao }}`, {{ prato.Preco }}, {{ prato.Estoque }}, `{{ prato.NomeRestaurante }}`, '{{ prato.Tipo }}')"
+      data-food-type="{{ prato.Tipo|lower }}" data-food-name="{{ prato.Nome }}">
+      <div class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+        <img src="https://source.unsplash.com/200x200/?food" alt="{{ prato.Nome }}"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
       </div>
       <div class="ml-4 flex-1 space-y-2">
         <div>
@@ -45,12 +35,8 @@
           {{ prato.Descricao }}
         </p>
         <div class="flex items-center justify-between pt-2">
-          <span class="text-lg font-bold text-orange-500"
-            >R$ {{ "%.2f"|format(prato.Preco) }}</span
-          >
-          <span class="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-full"
-            >Estoque: {{ prato.Estoque }}</span
-          >
+          <span class="text-lg font-bold text-orange-500">R$ {{ "%.2f"|format(prato.Preco) }}</span>
+          <span class="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-full">Estoque: {{ prato.Estoque }}</span>
         </div>
       </div>
     </div>
@@ -65,11 +51,8 @@
 
   {% if current_user.is_client %}
   <!-- Botão flutuante do carrinho -->
-  <button
-    id="cart-button"
-    onclick="abrirCheckout()"
-    class="fixed bottom-6 right-6 bg-orange-500 hover:bg-orange-600 text-white p-4 rounded-full shadow-lg z-50 hidden transition-all"
-  >
+  <button id="cart-button" onclick="abrirCheckout()"
+    class="fixed bottom-6 right-6 bg-orange-500 hover:bg-orange-600 text-white p-4 rounded-full shadow-lg z-50 hidden transition-all">
     🛒 <span id="cart-count">0</span>
   </button>
   {% endif %}
@@ -77,20 +60,12 @@
 
 {% if current_user.is_client %}
 <!-- Modal do Prato -->
-<div
-  id="prato-modal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
->
-  <div
-    class="bg-white rounded-lg p-0 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto"
-  >
+<div id="prato-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg p-0 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
     <!-- Modal header -->
     <div class="flex items-center justify-between p-4 border-b">
       <h3 id="modalPratoNome" class="text-xl font-semibold text-gray-900"></h3>
-      <button
-        onclick="fecharModalPrato()"
-        class="text-gray-400 hover:text-gray-600 text-2xl"
-      >
+      <button onclick="fecharModalPrato()" class="text-gray-400 hover:text-gray-600 text-2xl">
         &times;
       </button>
     </div>
@@ -99,75 +74,51 @@
     <div class="p-4 space-y-4">
       <div class="flex flex-row">
         <!-- Imagem à esquerda -->
-        <div class="w-2/5 bg-gray-200">
-          <img
-            id="modalPratoImagem"
-            src="../static/images/fooderama.png"
-            alt=""
-            class="w-full h-48 object-cover rounded"
-          />
+        <div class="w-2/5 bg-gray-200" style="
+            height: 350px;
+            position: relative;
+            bottom: -50px;
+            display: flex;
+          ">
+          <img id="modalPratoImagem" src="../static/images/fooderama.png" alt=""
+            class="w-full h-48 object-cover rounded" />
         </div>
 
         <!-- Informações à direita -->
         <div class="w-3/5 p-5 flex flex-col">
           <h2 id="modalPratoNome2" class="text-xl mb-2 font-semibold"></h2>
-          <a
-            id="modalPratoRestaurante"
-            href="#"
+          <a id="modalPratoRestaurante" href="#"
             class="text-sm text-blue-500 hover:text-blue-700 underline mb-2 inline-block"
-            onclick="abrirRestaurante()"
-          ></a>
+            onclick="abrirRestaurante()"></a>
           <p id="modalPratoDescricao" class="text-base text-gray-600 mb-4"></p>
-          <p
-            id="modalPratoPreco"
-            class="text-2xl text-orange-500 font-bold mb-2"
-          ></p>
+          <p id="modalPratoPreco" class="text-2xl text-orange-500 font-bold mb-2"></p>
 
           <!-- Informação de estoque -->
           <p id="modalPratoEstoque" class="text-sm text-gray-600 mb-4"></p>
 
           <!-- Campo de endereço -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-900 mb-2"
-              >Endereço de Entrega</label
-            >
-            <select
-              id="modalEndereco"
-              class="w-full border border-gray-300 rounded-md px-3 py-2"
-            >
+            <label class="block text-sm font-medium text-gray-900 mb-2">Endereço de Entrega</label>
+            <select id="modalEndereco" class="w-full border border-gray-300 rounded-md px-3 py-2">
               <option value="">Carregando endereços...</option>
             </select>
-            <button
-              onclick="adicionarEndereco()"
-              class="mt-2 text-sm text-blue-500 hover:text-blue-700"
-            >
+            <button onclick="adicionarEndereco()" class="mt-2 text-sm text-blue-500 hover:text-blue-700">
               + Adicionar novo endereço
             </button>
           </div>
 
           <!-- Controle de quantidade -->
           <div class="flex flex-col mb-4">
-            <label class="block text-sm font-medium text-gray-900 mb-1"
-              >Quantidade</label
-            >
+            <label class="block text-sm font-medium text-gray-900 mb-1">Quantidade</label>
             <div class="flex items-center gap-3">
-              <button
-                onclick="diminuirQuantidade()"
-                class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
-              >
+              <button onclick="diminuirQuantidade()"
+                class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300">
                 -
               </button>
-              <input
-                type="number"
-                id="modalQuantidade"
-                value="1"
-                min="1"
-                class="w-16 text-center border border-gray-300 rounded-md py-1"
-              />
-              <button
-                onclick="aumentarQuantidade()"
-                class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
-              >
+              <input type="number" id="modalQuantidade" value="1" min="1"
+                class="w-16 text-center border border-gray-300 rounded-md py-1" />
+              <button onclick="aumentarQuantidade()"
+                class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300">
                 +
               </button>
             </div>
@@ -175,10 +126,7 @@
 
           <!-- Valor total -->
           <div class="mt-4">
-            <p
-              id="modalValorTotal"
-              class="text-lg font-semibold text-gray-900"
-            ></p>
+            <p id="modalValorTotal" class="text-lg font-semibold text-gray-900"></p>
           </div>
         </div>
       </div>
@@ -189,10 +137,8 @@
       <div id="modalValorTotal" class="text-lg font-bold text-gray-800">
         Valor total: R$ 0,00
       </div>
-      <button
-        onclick="adicionarAoCarrinho()"
-        class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-      >
+      <button onclick="adicionarAoCarrinho()"
+        class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
         Adicionar ao carrinho
       </button>
     </div>
@@ -200,19 +146,11 @@
 </div>
 
 <!-- Modal para finalizar compra -->
-<div
-  id="checkout-modal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
->
-  <div
-    class="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto"
-  >
+<div id="checkout-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">Carrinho</h2>
-      <button
-        onclick="fecharCheckout()"
-        class="text-gray-500 hover:text-gray-700 text-2xl"
-      >
+      <button onclick="fecharCheckout()" class="text-gray-500 hover:text-gray-700 text-2xl">
         &times;
       </button>
     </div>
@@ -221,10 +159,7 @@
       <!-- Itens do carrinho serão inseridos aqui -->
     </div>
 
-    <div
-      class="text-center text-lg font-bold text-orange-500 mb-4"
-      id="total-value"
-    >
+    <div class="text-center text-lg font-bold text-orange-500 mb-4" id="total-value">
       Total: R$ 0,00
     </div>
 
@@ -233,34 +168,26 @@
       <h3 class="font-semibold text-gray-900 mb-3">Método de Pagamento</h3>
 
       <div class="mb-3">
-        <select
-          id="payment-method-select"
-          class="w-full border border-gray-300 rounded-md px-3 py-2"
-          onchange="onPaymentMethodChange()"
-        >
+        <select id="payment-method-select" class="w-full border border-gray-300 rounded-md px-3 py-2"
+          onchange="onPaymentMethodChange()">
           <option value="">Selecione um método de pagamento</option>
           <!-- Opções serão carregadas via JavaScript -->
         </select>
       </div>
 
-      <button
-        onclick="abrirCadastroPagamento()"
-        class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium mb-3"
-      >
+      <button onclick="abrirCadastroPagamento()"
+        class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium mb-3">
         + Cadastrar Novo Método de Pagamento
       </button>
     </div>
-    <button
-      onclick="finalizarPedido()"
-      id="confirm-order-btn"
-      class="w-full bg-gray-400 cursor-not-allowed text-white py-3 rounded-lg font-medium"
-      disabled
-    >
+    <button onclick="finalizarPedido()" id="confirm-order-btn"
+      class="w-full bg-gray-400 cursor-not-allowed text-white py-3 rounded-lg font-medium" disabled>
       Selecione um método de pagamento
     </button>
   </div>
 </div>
 
+<script src="{{ url_for('static', filename='js/food-images.js') }}"></script>
 <script src="{{ url_for('static', filename='js/pratos_por_tipo.js') }}"></script>
 
 {% endif %} {% endblock %}

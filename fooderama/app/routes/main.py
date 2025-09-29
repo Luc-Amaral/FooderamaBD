@@ -85,7 +85,12 @@ def restaurant():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM prato WHERE ID_Restaurante_FK = %s", (restaurant_id,))
+    cursor.execute("""
+        SELECT p.*, tp.Tipo as TipoPrato 
+        FROM prato p 
+        JOIN tipo_prato tp ON p.ID_TipoPrato_FK = tp.ID_TipoPrato 
+        WHERE p.ID_Restaurante_FK = %s
+    """, (restaurant_id,))
     pratos = cursor.fetchall()
 
     cursor.execute("SELECT * FROM restaurante WHERE ID_Restaurante = %s", (restaurant_id,))

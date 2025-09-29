@@ -115,7 +115,8 @@ function abrirModalPrato(
   descricao,
   preco,
   estoque,
-  nomeRestaurante
+  nomeRestaurante,
+  tipoPrato = ""
 ) {
   currentPrato = {
     id: id,
@@ -125,6 +126,7 @@ function abrirModalPrato(
     preco: preco,
     estoque: estoque,
     nomeRestaurante: nomeRestaurante,
+    tipoPrato: tipoPrato,
   };
 
   document.getElementById("modalPratoNome").textContent = nome;
@@ -135,6 +137,16 @@ function abrirModalPrato(
   )}`;
   document.getElementById("modalQuantidade").value = 1;
   document.getElementById("modalQuantidade").max = estoque;
+
+  // Carregar imagem do prato no modal
+  if (window.FoodImageAPI && tipoPrato) {
+    const modalImage = document.getElementById("modalPratoImagem");
+    window.FoodImageAPI.loadFoodImage(
+      tipoPrato.toLowerCase(),
+      nome,
+      modalImage
+    );
+  }
 
   atualizarValorTotal();
   document.getElementById("prato-modal").classList.remove("hidden");

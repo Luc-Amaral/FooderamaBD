@@ -58,12 +58,12 @@
       {% for prato in pratos %} {% if prato.StatusDisponibilidade == 1 %}
       <!-- Card do prato disponível -->
       <button
-        onclick="abrirModalPrato('{{ prato.ID_Prato }}', '{{ restaurante.ID_Restaurante }}', '{{ prato.Nome }}', '{{ prato.Descricao }}', {{ prato.Preco }}, {{ prato.Estoque }}, '{{ restaurante.NomeRestaurante }}')"
+        onclick="abrirModalPrato('{{ prato.ID_Prato }}', '{{ restaurante.ID_Restaurante }}', '{{ prato.Nome }}', '{{ prato.Descricao }}', {{ prato.Preco }}, {{ prato.Estoque }}, '{{ restaurante.NomeRestaurante }}', '{{ prato.TipoPrato }}')"
         class="flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 hover:scale-[1.01] hover:shadow-lg hover:ring-1 hover:ring-gray-900/5 transition-transform duration-300"
-        type="button">
+        type="button" data-food-type="{{ prato.TipoPrato|lower }}" data-food-name="{{ prato.Nome }}">
         <div class="w-32 h-32 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/{{ food_type }}.png" alt="{{ food_type }}"
-            class="h-full w-full object-cover object-center group-hover:opacity-75" />
+          <img src="https://source.unsplash.com/400x300/?food" alt="{{ prato.Nome }}"
+            class="h-full w-full object-cover object-center group-hover:opacity-75" loading="lazy" />
         </div>
         <div class="ml-4 flex flex-col items-start text-sm w-3/5 max-w-full overflow-hidden">
           <p class="text-xl">{{ prato.Nome }}</p>
@@ -83,10 +83,11 @@
       {% endif %} {% if prato.StatusDisponibilidade == 0 and
       current_user.id_endereco == restaurante.ID_Endereco_FK %}
       <!-- Card do prato indisponível -->
-      <div class="flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 opacity-50 cursor-not-allowed">
+      <div class="flex items-center border-[1px] border-gray-200 rounded-3xl px-2 py-2 opacity-50 cursor-not-allowed"
+        data-food-type="{{ prato.TipoPrato|lower }}" data-food-name="{{ prato.Nome }}">
         <div class="w-32 h-32 overflow-hidden rounded-2xl bg-gray-200">
-          <img src="../static/images/tipos_comida/{{ food_type }}.png" alt="{{ food_type }}"
-            class="h-full w-full object-cover object-center filter grayscale" />
+          <img src="https://source.unsplash.com/400x300/?food" alt="{{ prato.Nome }}"
+            class="h-full w-full object-cover object-center filter grayscale" loading="lazy" />
         </div>
         <div class="ml-4 flex flex-col items-start text-sm w-3/5 max-w-full overflow-hidden">
           <p class="text-xl">{{ prato.Nome }}</p>
@@ -131,7 +132,7 @@
     <div class="p-4 space-y-4">
       <div class="flex flex-row">
         <!-- Imagem à esquerda -->
-        <div class="w-2/5 bg-gray-200">
+        <div class="w-2/5 bg-gray-200 relative h-fit top-12">
           <img id="modalPratoImagem" src="../static/images/fooderama.png" alt=""
             class="w-full h-48 object-cover rounded" />
         </div>
@@ -229,5 +230,6 @@
 </div>
 {% endif %}
 
+<script src="{{ url_for('static', filename='js/food-images.js') }}"></script>
 <script src="{{ url_for('static', filename='js/restaurant_new.js') }}"></script>
 {% endblock %}
