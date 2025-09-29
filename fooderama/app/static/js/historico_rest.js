@@ -15,6 +15,43 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Funcionalidade do modal de observações
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('observacoes-btn')) {
+      const pedidoId = e.target.getAttribute('data-pedido-id');
+      abrirModalObservacoes(pedidoId);
+    }
+  });
+
+  function abrirModalObservacoes(pedidoId) {
+    const modal = document.getElementById('observacoesModal');
+    const pedidoIdElement = document.getElementById('pedidoId');
+    const observacoesTexto = document.getElementById('observacoesTexto');
+    
+    pedidoIdElement.textContent = pedidoId;
+    observacoesTexto.textContent = 'Carregando...';
+    modal.classList.remove('hidden');
+
+    fetch(`/api/pedido_observacoes/${pedidoId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          observacoesTexto.textContent = `Erro: ${data.error}`;
+        } else {
+          observacoesTexto.textContent = data.observacoes;
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao carregar observações:', error);
+        observacoesTexto.textContent = 'Erro ao carregar observações';
+      });
+  }
+
+  window.fecharModalObservacoes = function() {
+    const modal = document.getElementById('observacoesModal');
+    modal.classList.add('hidden');
+  };
+
   // Função para obter contagem inicial de pedidos na página
   function getInitialOrderCount() {
     const pendingOrderRows = document.querySelectorAll(
@@ -103,20 +140,27 @@ document.addEventListener("DOMContentLoaded", function () {
         <td class="py-4 pr-4">${order.date} ${order.time}</td>
         <td class="py-4 pr-4">${order.total.toFixed(2)}</td>
         <td class="py-4 pr-4">
-          <form action="/aceitar_pedido/${
-            order.ID_Pedido
-          }" method="post" style="display: inline">
-            <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-lg mr-2">
-              Aceitar
+          <!-- Botão Observações (em cima) -->
+          <div class="mb-2">
+            <button type="button" 
+                    class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg observacoes-btn hover:bg-blue-600"
+                    data-pedido-id="${order.ID_Pedido}">
+              Observações
             </button>
-          </form>
-          <form action="/recusar_pedido/${
-            order.ID_Pedido
-          }" method="post" style="display: inline">
-            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-lg">
-              Recusar
-            </button>
-          </form>
+          </div>
+          <!-- Botões Aceitar e Recusar (embaixo, lado a lado) -->
+          <div class="flex gap-2">
+            <form action="/aceitar_pedido/${order.ID_Pedido}" method="post" class="flex-1">
+              <button type="submit" class="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                Aceitar
+              </button>
+            </form>
+            <form action="/recusar_pedido/${order.ID_Pedido}" method="post" class="flex-1">
+              <button type="submit" class="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                Recusar
+              </button>
+            </form>
+          </div>
         </td>
       `;
 

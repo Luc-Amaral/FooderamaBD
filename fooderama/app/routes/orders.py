@@ -13,6 +13,7 @@ def finalizar_compra():
     data = request.json
     payment_method = data.get('payment_method')
     cart_items = data.get('cart_items')
+    observacoes = data.get('observacoes', '').strip()  # Nova linha para observações
 
     if not cart_items:
         return jsonify({'error': 'Carrinho vazio'}), 400
@@ -36,11 +37,11 @@ def finalizar_compra():
         # Gera UUID para o pedido
         id_pedido = str(uuid.uuid4())
 
-        # Insere o pedido na tabela pedido com status = FINALIZADO
+        # Insere o pedido na tabela pedido com observações
         cursor.execute("""
-            INSERT INTO pedido (ID_Pedido, ID_Cliente_FK, ID_Endereco_FK, ID_MetodoPagamento_FK, Data, Hora, status)
-            VALUES (%s, %s, %s, %s, CURDATE(), CURTIME(), 'PENDENTE')
-        """, (id_pedido, current_user.id, id_endereco, payment_method))
+            INSERT INTO pedido (ID_Pedido, ID_Cliente_FK, ID_Endereco_FK, ID_MetodoPagamento_FK, Data, Hora, status, observacoes)
+            VALUES (%s, %s, %s, %s, CURDATE(), CURTIME(), 'PENDENTE', %s)
+        """, (id_pedido, current_user.id, id_endereco, payment_method, observacoes if observacoes else None))
         conn.commit()
 
         # Insere os itens na tabela item
@@ -164,6 +165,7 @@ def historico_rest():
             p.Data as date, 
             p.Hora as time, 
             p.status as status,
+            p.observacoes,
             ROUND((
                 SELECT SUM(pr.Preco * i.Quantidade) * 0.97
                 FROM item i
@@ -180,7 +182,13 @@ def historico_rest():
 
     # Buscar histórico de pedidos para o restaurante atual
     cursor.execute("""
-        SELECT DISTINCT p.ID_Pedido, mp.TipoMetodo as payment_method, p.Data as date, p.Hora as time, p.status as status
+        SELECT DISTINCT 
+            p.ID_Pedido, 
+            mp.TipoMetodo as payment_method, 
+            p.Data as date, 
+            p.Hora as time, 
+            p.status as status,
+            p.observacoes
         FROM pedido p
         JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
         JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
@@ -340,6 +348,7 @@ def get_restaurant_orders():
                 p.Data as date, 
                 p.Hora as time, 
                 p.status as status,
+                p.observacoes,
                 ROUND((
                     SELECT SUM(pr.Preco * i.Quantidade) * 0.97
                     FROM item i
@@ -366,6 +375,42 @@ def get_restaurant_orders():
 
     except Exception as e:
         print(f"DEBUG: Erro na API get_restaurant_orders: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@orders_bp.route('/api/pedido_observacoes/<pedido_id>')
+@login_required
+def get_pedido_observacoes(pedido_id):
+    """API para obter observações de um pedido específico"""
+    if not isinstance(current_user, Restaurante):
+        return jsonify({'error': 'Acesso negado - apenas restaurantes'}), 403
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Verificar se o pedido pertence ao restaurante e buscar observações
+        cursor.execute("""
+            SELECT p.observacoes, p.ID_Pedido
+            FROM pedido p
+            JOIN item i ON p.ID_Pedido = i.ID_Pedido_FK
+            JOIN prato pr ON i.ID_Prato_FK = pr.ID_Prato
+            WHERE p.ID_Pedido = %s AND pr.ID_Restaurante_FK = %s
+            LIMIT 1
+        """, (pedido_id, current_user.id))
+        
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not result:
+            return jsonify({'error': 'Pedido não encontrado'}), 404
+
+        return jsonify({
+            'pedido_id': result['ID_Pedido'],
+            'observacoes': result['observacoes'] or 'Nenhuma observação'
+        })
+
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @orders_bp.route('/api/check_new_orders')
