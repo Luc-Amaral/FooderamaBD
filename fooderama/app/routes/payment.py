@@ -41,12 +41,10 @@ def cadastrar_pagamento():
                 data_vencimento_raw = request.form['data_vencimento']
                 cvv = request.form['cvv']
                 
-                # Converter data de MM/AA para YYYY-MM-DD
+             
                 if '/' in data_vencimento_raw and len(data_vencimento_raw) == 5:
                     mes, ano = data_vencimento_raw.split('/')
-                    # Assumir século 20XX se ano for menor que 50, senão 19XX
                     ano_completo = f"20{ano}" if int(ano) < 50 else f"19{ano}"
-                    # Usar o último dia do mês
                     ultimo_dia = calendar.monthrange(int(ano_completo), int(mes))[1]
                     data_vencimento = f"{ano_completo}-{mes.zfill(2)}-{ultimo_dia:02d}"
                 else:

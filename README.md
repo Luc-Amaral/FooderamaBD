@@ -7,14 +7,14 @@ Sumario:(ctrl + click nos links)
 
 ## Requerimentos:(recomendado instalar automatico com: docker-compose up -d --build)
 
-**Flask==3.0.0**
-**Flask-CORS==4.0.1**
-**Flask-Login==0.6.3**
-**Werkzeug==3.0.1**
-**mysql-connector-python==8.2.0**
-**python-dotenv==1.0.0**
-**requests==2.31.0**
-**pyinstaller==6.3.0**
+- **Flask==3.0.0**
+- **Flask-CORS==4.0.1**
+- **Flask-Login==0.6.3**
+- **Werkzeug==3.0.1**
+- **mysql-connector-python==8.2.0**
+- **python-dotenv==1.0.0**
+- **requests==2.31.0**
+- **pyinstaller==6.3.0**
 
 ### Pré-requisitos
 
@@ -234,7 +234,7 @@ pagamento (PIX, Débito, Crédito)
 
 ```
 fooderama/
-├── 🐳 docker-compose.yml        # Orquestração de containers
+├── 🐳 docker-compose.yml       # Orquestração de containers
 ├── 🐳 Dockerfile               # Imagem da aplicação Python
 ├── 📋 requirements.txt         # Dependências Python
 ├── ⚙️ microblog.py             # Entry point da aplicação

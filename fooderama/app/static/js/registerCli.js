@@ -13,7 +13,7 @@ function showMessage() {
     messageAlert.classList.add("hidden");
   }
 
-  return true; // Allow form submission
+  return true; 
 }
 
 // Adicionar eventos quando o documento estiver carregado

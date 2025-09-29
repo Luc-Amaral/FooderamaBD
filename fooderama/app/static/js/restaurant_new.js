@@ -317,7 +317,7 @@ function removerDoCarrinho(index) {
     currentRestaurantId = null;
     fecharCheckout();
   } else {
-    abrirCheckout(); // Reabrir para atualizar
+    abrirCheckout(); 
   }
   atualizarCarrinho();
 }
