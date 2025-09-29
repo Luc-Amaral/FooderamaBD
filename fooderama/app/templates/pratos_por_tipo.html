@@ -19,8 +19,9 @@
       onclick="abrirModalPrato('{{ prato.ID_Prato }}', '{{ prato.ID_Restaurante_FK }}', `{{ prato.Nome }}`, `{{ prato.Descricao }}`, {{ prato.Preco }}, {{ prato.Estoque }}, `{{ prato.NomeRestaurante }}`, '{{ prato.Tipo }}')"
       data-food-type="{{ prato.Tipo|lower }}" data-food-name="{{ prato.Nome }}">
       <div class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-        <img src="https://source.unsplash.com/200x200/?food" alt="{{ prato.Nome }}"
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+        <img src="0
+          alt=" {{ prato.Nome }}" class="h-full w-full object-cover object-center group-hover:opacity-75"
+          loading="lazy" />
       </div>
       <div class="ml-4 flex-1 space-y-2">
         <div>
@@ -74,12 +75,7 @@
     <div class="p-4 space-y-4">
       <div class="flex flex-row">
         <!-- Imagem à esquerda -->
-        <div class="w-2/5 bg-gray-200" style="
-            height: 350px;
-            position: relative;
-            bottom: -50px;
-            display: flex;
-          ">
+        <div class="w-2/5 bg-gray-200 h-fit relative top-12">
           <img id="modalPratoImagem" src="../static/images/fooderama.png" alt=""
             class="w-full h-48 object-cover rounded" />
         </div>

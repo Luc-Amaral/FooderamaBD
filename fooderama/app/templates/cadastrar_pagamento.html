@@ -31,7 +31,7 @@
         <label
           class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
           <input type="radio" name="tipo_metodo" value="PIX" class="mr-3 text-blue-600 focus:ring-blue-500"
-            onchange="toggleCartaoFields()" />
+            onchange="window.PaymentFormAPI.toggleCartaoFields()" />
           <div class="flex items-center">
             <div class="bg-blue-100 p-2 rounded-lg mr-3">
               <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
@@ -50,7 +50,7 @@
         <label
           class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
           <input type="radio" name="tipo_metodo" value="Debito" class="mr-3 text-green-600 focus:ring-green-500"
-            onchange="toggleCartaoFields()" />
+            onchange="window.PaymentFormAPI.toggleCartaoFields()" />
           <div class="flex items-center">
             <div class="bg-green-100 p-2 rounded-lg mr-3">
               <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
@@ -69,7 +69,7 @@
         <label
           class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
           <input type="radio" name="tipo_metodo" value="Credito" class="mr-3 text-orange-600 focus:ring-orange-500"
-            onchange="toggleCartaoFields()" />
+            onchange="window.PaymentFormAPI.toggleCartaoFields()" />
           <div class="flex items-center">
             <div class="bg-orange-100 p-2 rounded-lg mr-3">
               <svg class="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
@@ -86,7 +86,7 @@
       </div>
     </div>
 
-    <!-- Campos do cartão (ocultos por padrão) -->
+    <!-- Campos do cartão  -->
     <div id="cartaoFields" class="flex flex-col gap-4 hidden">
       <h3 class="text-lg font-semibold text-gray-900 mb-2">Dados do Cartão</h3>
 
@@ -116,7 +116,7 @@
             <input type="text" id="data_vencimento" name="data_vencimento" maxlength="5" placeholder="MM/AA"
               pattern="\d{2}/\d{2}" title="Digite no formato MM/AA (exemplo: 12/25)"
               class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm"
-              oninput="formatExpiry(this)" />
+              oninput="window.PaymentFormAPI.formatExpiry(this)" />
           </div>
         </div>
 
@@ -198,7 +198,7 @@
 
       <!-- Botão de excluir -->
       <form action="{{ url_for('payment.excluir_pagamento', metodo_id=metodo.ID_MetodoPagamento) }}" method="POST"
-        onsubmit="return confirm('Tem certeza que deseja excluir este método de pagamento?')" class="inline">
+        onsubmit="return window.PaymentFormAPI.confirmDelete('{{ metodo.ID_MetodoPagamento }}')" class="inline">
         <button type="submit" class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-colors"
           title="Excluir método de pagamento">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,7 +220,7 @@
   {% endif %}
 </div>
 
+<!-- Importar JavaScript externo -->
 <script src="{{ url_for('static', filename='js/cadastrar_pagamento.js') }}"></script>
-
 
 {% endblock %}

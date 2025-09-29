@@ -1,6 +1,9 @@
 // Configuração da API Unsplash - Chave configurada
 const UNSPLASH_ACCESS_KEY = "i7dc1sDWW9VYI4wYRS807fkjL17o77mGaXy3s7y_LWU";
 
+// Teste de carregamento
+console.log("DEBUG: food-images.js carregado");
+
 // Mapeamento de tipos de comida para termos de busca em inglês (melhores resultados)
 const foodTypeMapping = {
   pizza: "pizza food",

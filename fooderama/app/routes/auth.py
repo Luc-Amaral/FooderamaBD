@@ -10,7 +10,7 @@ auth_bp = Blueprint('auth', __name__)
 
 def get_cliente_by_email(email):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)  # Use `dictionary=True` para retornar um dicionário
+    cursor = conn.cursor(dictionary=True) 
 
     try:
         # Busca na tabela cliente
@@ -22,7 +22,7 @@ def get_cliente_by_email(email):
                 id_cliente=row['ID_Cliente'],
                 cpf=row['CPF'],
                 email=row['Email'],
-                senha=row['Senha'],  # Não gere hash novamente ao carregar do banco
+                senha=row['Senha'],  
                 telefone=row['Telefone'],
                 nome=row['Nome'],
                 sobrenome=row['Sobrenome']
@@ -32,13 +32,12 @@ def get_cliente_by_email(email):
         cursor.execute("SELECT * FROM restaurante WHERE Email = %s", (email,))
         row = cursor.fetchone()
         if row:
-            # Cria um objeto Restaurante usando os valores recuperados do banco, sem gerar um novo hash para `senha`
             return Restaurante(
                 id_restaurante=row['ID_Restaurante'],
                 id_endereco=row['ID_Endereco_FK'],
                 nome_restaurante=row['NomeRestaurante'],
                 email=row['Email'],
-                senha=row['Senha'],  # Não gere hash novamente ao carregar do banco
+                senha=row['Senha'], 
                 telefone=row['Telefone']
             )
 
@@ -157,7 +156,7 @@ def register_cliente():
                 flash('Todos os campos de endereço são obrigatórios.')
                 return render_template('registerCli.html')
 
-            # Verificação final: confirma se o cliente foi inserido
+            # confirma se o cliente foi inserido
             cursor.execute("SELECT COUNT(*) FROM cliente WHERE Email = %s", (email,))
             count = cursor.fetchone()[0]
             print(f"DEBUG CADASTRO: Verificação final - cliente encontrado no banco: {count > 0}")
@@ -270,9 +269,9 @@ def format_time(time_str):
     try:
         # Tentar parse a string no formato HH:MM
         time_obj = datetime.strptime(time_str, '%H:%M')
-        return time_obj.strftime('%H:%M')  # Retorna o formato XX:XX
+        return time_obj.strftime('%H:%M') 
     except ValueError:
-        return "00:00"  # Valor padrão caso haja erro no formato
+        return "00:00"
 
 @auth_bp.route('/logout')
 @login_required

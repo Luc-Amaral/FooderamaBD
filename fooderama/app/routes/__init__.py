@@ -14,7 +14,7 @@ def setup_routes(app):
     # Configurar o Login Manager
     login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.autenticar_login'  # Atualizado para usar o blueprint
+    login_manager.login_view = 'auth.autenticar_login' 
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -45,7 +45,7 @@ def setup_routes(app):
                     id_endereco=row['ID_Endereco_FK'],
                     nome_restaurante=row['NomeRestaurante'],
                     email=row['Email'],
-                    senha=row['Senha'],  # Não gere hash novamente ao carregar do banco
+                    senha=row['Senha'],
                     telefone=row['Telefone']
                 )
             

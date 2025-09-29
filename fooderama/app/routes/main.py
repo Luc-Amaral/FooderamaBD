@@ -77,6 +77,11 @@ def pratos_por_tipo():
     
     return render_template('pratos_por_tipo.html', pratos=pratos, tipo=food_type)
 
+@main_bp.route('/404')
+def error_404():
+    """Rota específica para página 404 (Easter Egg)"""
+    return render_template('404.html'), 404
+
 @main_bp.route('/restaurant')
 @login_required
 def restaurant():

@@ -6,7 +6,7 @@ class Cliente(UserMixin):
         self.id = id_cliente
         self.cpf = cpf
         self.email = email
-        self.senha_hash = senha  # Armazena a senha como hash
+        self.senha_hash = senha  
         self.telefone = telefone
         self.nome = nome
         self.sobrenome = sobrenome
