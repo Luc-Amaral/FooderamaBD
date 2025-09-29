@@ -67,9 +67,7 @@
 
     <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
       <!-- Produtos com popup -->
-      {% for prato in pratos %} 
-      
-      {% if prato.StatusDisponibilidade == 1 %}
+      {% for prato in pratos %} {% if prato.StatusDisponibilidade == 1 %}
       <!-- Card do prato disponível -->
       <button
         onclick="abrirModalPrato('{{ prato.ID_Prato }}', '{{ restaurante.ID_Restaurante }}', '{{ prato.Nome }}', '{{ prato.Descricao }}', {{ prato.Preco }}, {{ prato.Estoque }}, '{{ restaurante.NomeRestaurante }}', '{{ prato.TipoPrato }}')"
@@ -103,7 +101,7 @@
           </div>
         </div>
       </button>
-      
+
       {% elif prato.StatusDisponibilidade == 0 %}
       <!-- Card do prato indisponível (visível para TODOS) -->
       <div
@@ -120,9 +118,17 @@
             loading="lazy"
           />
           <!-- Ícone de indisponível -->
-          <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
-            <svg class="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"/>
+          <div
+            class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40"
+          >
+            <svg
+              class="w-8 h-8 text-red-500"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"
+              />
             </svg>
           </div>
         </div>
@@ -136,19 +142,22 @@
           <div class="flex justify-between w-full pt-2">
             <div class="text-red-500 font-semibold flex items-center">
               <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM13 17h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM13 17h-2v-6h2v6zm0-8h-2V7h2v2z"
+                />
               </svg>
               Indisponível
             </div>
-            <p class="text-end flex items-end font-bold text-base text-gray-500">
+            <p
+              class="text-end flex items-end font-bold text-base text-gray-500"
+            >
               <span>R$</span>{{ '%.2f'|format(prato.Preco) }}
             </p>
           </div>
         </div>
       </div>
-      
-      {% endif %}
-      {% endfor %}
+
+      {% endif %} {% endfor %}
     </div>
   </div>
 </div>
