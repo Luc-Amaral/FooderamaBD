@@ -1,19 +1,5 @@
--- ===============================================================
--- CONFIGURAÇÃO DE ISOLAMENTO TRANSACIONAL
--- ===============================================================
--- Arquivo: 04-isolamento-transacional.sql
--- Objetivo: Evitar problemas de concorrência em transações simultâneas
--- Nível: READ COMMITTED para balancear consistência e performance
--- ===============================================================
 
 USE fooderama;
-
--- ===============================================================
--- CONFIGURAÇÃO GLOBAL DE ISOLAMENTO
--- ===============================================================
-
--- Definir nível de isolamento padrão como READ COMMITTED
--- Isso garante que transações não vejam dados não commitados
 SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
 SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;
 
@@ -46,7 +32,7 @@ BEGIN
     SELECT status INTO v_pedido_status
     FROM pedido 
     WHERE ID_Pedido = p_pedido_id
-    FOR UPDATE; -- Lock pessimista para evitar modificações concorrentes
+    FOR UPDATE;
     
     IF v_pedido_status IS NULL THEN
         SET v_erro = 'Pedido não encontrado';
@@ -58,7 +44,6 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_erro;
     END IF;
     
-    -- Verificar estoque disponível para todos os itens do pedido
     -- Usando SELECT FOR UPDATE para lock dos registros
     SELECT COUNT(*) INTO v_estoque_insuficiente
     FROM item i
@@ -101,11 +86,8 @@ DELIMITER ;
 -- CONFIGURAÇÕES ADICIONAIS DE SEGURANÇA
 -- ===============================================================
 
--- Configurar timeout para locks (evitar deadlocks prolongados)
 SET SESSION innodb_lock_wait_timeout = 10;
 SET GLOBAL innodb_lock_wait_timeout = 10;
-
--- Configurar deadlock detection (MySQL detecta e resolve automaticamente)
 SET GLOBAL innodb_deadlock_detect = ON;
 
 -- ===============================================================
@@ -124,7 +106,6 @@ CREATE PROCEDURE sp_verificar_estoque_disponivel(
 BEGIN
     DECLARE v_estoque_atual INT DEFAULT 0;
     
-    -- Usar SELECT FOR SHARE para verificação não bloqueante
     SELECT Estoque INTO v_estoque_atual
     FROM prato 
     WHERE ID_Prato = p_prato_id 
@@ -140,10 +121,6 @@ BEGIN
 END //
 
 DELIMITER ;
-
--- ===============================================================
--- ÍNDICES PARA OTIMIZAR CONSULTAS CONCORRENTES
--- ===============================================================
 
 -- Índice composto para otimizar verificações de pedido
 CREATE INDEX idx_pedido_status_data 

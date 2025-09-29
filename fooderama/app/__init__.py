@@ -7,7 +7,7 @@ import datetime
 def create_app():
     app = Flask(__name__)
     app.secret_key = 'sua_chave_secreta_aqui'
-    CORS(app)  # Adiciona suporte a CORS para toda a aplicação
+    CORS(app)  
     
     # Filtro customizado para formatar horários
     @app.template_filter('format_time')

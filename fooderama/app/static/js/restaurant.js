@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   const modal = document.getElementById("static-modal");
-  const modalBackdrop = document.getElementById("static-modal"); // Usar o mesmo elemento
+  const modalBackdrop = document.getElementById("static-modal");
   const modalContent = document.getElementById("addToCartForm");
   const pratoImagem = document.getElementById("modalPratoImagem");
   const pratoNome = document.getElementById("modalPratoNome");
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const totalValue = document.getElementById("totalValue");
   const quantidadeInput = document.querySelector('input[name="quantidade"]');
   let currentPrato = null;
-  let currentEnderecos = []; // Armazenar endereços atuais
+  let currentEnderecos = [];
 
   // Elementos do modal de endereços
   const addressModal = document.getElementById("addressModal");
@@ -36,7 +36,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const addressList = document.getElementById("addressList");
   const addNewAddressBtn = document.getElementById("addNewAddressBtn");
 
-  // Função global para selecionar endereço (precisa estar fora do DOMContentLoaded)
   window.selectAddress = function (addressId) {
     const selectedAddress = currentEnderecos.find(
       (addr) => addr.ID_Endereco === addressId
