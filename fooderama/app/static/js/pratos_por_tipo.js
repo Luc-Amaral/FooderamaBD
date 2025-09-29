@@ -333,6 +333,9 @@ function finalizarPedido() {
     quantidade: item.quantidade,
   }));
 
+  // Obter observações do textarea
+  const observacoes = document.getElementById("observacoes-pedido").value.trim();
+
   // Fazer requisição para finalizar pedido
   fetch("/finalizar_compra", {
     method: "POST",
@@ -351,10 +354,11 @@ function finalizarPedido() {
         alert("Erro: " + data.error);
       } else {
         alert(data.message);
-        // Limpar carrinho
+        // Limpar carrinho e observações
         cart = [];
         currentRestaurantId = null;
         selectedPaymentMethod = null;
+        document.getElementById("observacoes-pedido").value = "";
         atualizarCarrinho();
         fecharCheckout();
       }
