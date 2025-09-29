@@ -77,6 +77,11 @@ def pratos_por_tipo():
     
     return render_template('pratos_por_tipo.html', pratos=pratos, tipo=food_type)
 
+@main_bp.route('/404')
+def error_404():
+    """Rota específica para página 404 (Easter Egg)"""
+    return render_template('404.html'), 404
+
 @main_bp.route('/restaurant')
 @login_required
 def restaurant():
@@ -85,7 +90,12 @@ def restaurant():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM prato WHERE ID_Restaurante_FK = %s", (restaurant_id,))
+    cursor.execute("""
+        SELECT p.*, tp.Tipo as TipoPrato 
+        FROM prato p 
+        JOIN tipo_prato tp ON p.ID_TipoPrato_FK = tp.ID_TipoPrato 
+        WHERE p.ID_Restaurante_FK = %s
+    """, (restaurant_id,))
     pratos = cursor.fetchall()
 
     cursor.execute("SELECT * FROM restaurante WHERE ID_Restaurante = %s", (restaurant_id,))

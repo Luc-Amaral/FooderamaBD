@@ -1,15 +1,4 @@
--- ===============================================================
--- FUNCIONALIDADES AVANÇADAS DO SISTEMA FOODERAMA
--- Arquivo: funcionalidades_fooderama.sql
--- Criado em: 01/09/2025
--- Descrição: Triggers, funções e procedimentos para o sistema
--- ===============================================================
 
-
-
--- ===============================================================
--- TRIGGERS DE VALIDAÇÃO
--- ===============================================================
 
 DELIMITER //
 
@@ -62,7 +51,6 @@ BEGIN
     
     -- Só verificar se a quantidade aumentou
     IF diferenca_quantidade > 0 THEN
-        -- Buscar o estoque disponível do prato
         SELECT Estoque, Nome
         INTO estoque_disponivel, nome_prato
         FROM prato 
@@ -92,7 +80,6 @@ BEGIN
     FROM pedido 
     WHERE ID_Pedido = NEW.ID_Pedido_FK;
     
-    -- Só decrementar estoque se o pedido estiver aceito
     IF status_pedido = 'ACEITO' THEN
         UPDATE prato 
         SET Estoque = Estoque - NEW.Quantidade
@@ -138,7 +125,7 @@ BEGIN
         WHERE i.ID_Pedido_FK = NEW.ID_Pedido;
     END IF;
     
-    -- INCREMENTA o estoque (devolve os itens) se um pedido previamente aceito for CANCELADO
+    -- INCREMENTA o estoque se um pedido previamente aceito for CANCELADO
     IF NEW.status = 'CANCELADO' AND OLD.status IN ('ACEITO', 'Em preparação') THEN
         UPDATE prato p
         JOIN item i ON p.ID_Prato = i.ID_Prato_FK
@@ -148,11 +135,6 @@ BEGIN
 END //
 
 DELIMITER;
-
--- ===============================================================
--- STORED PROCEDURES
--- ===============================================================
-
 DELIMITER //
 
 -- ---------------------------------------------------------------
@@ -231,8 +213,6 @@ DELIMITER ;
 
 -- ===============================================================
 -- TRIGGER PARA CONTROLE AUTOMÁTICO DE DISPONIBILIDADE POR ESTOQUE
--- Data: 28/09/2025
--- Descrição: Atualiza automaticamente StatusDisponibilidade baseado no estoque
 -- ===============================================================
 
 DELIMITER //

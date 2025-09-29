@@ -189,7 +189,6 @@ def historico_rest():
     """, (current_user.id,))
     historical_orders = cursor.fetchall()
 
-    # Calcular o valor total de cada pedido histórico e subtrair 3%
     for order in historical_orders:
         cursor.execute("""
             SELECT ROUND(SUM(pr.Preco * i.Quantidade), 2) as total

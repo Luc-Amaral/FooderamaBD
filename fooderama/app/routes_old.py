@@ -14,7 +14,7 @@ def setup_routes(app):
     # Configurar o Login Manager
     login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.autenticar_login'  # Atualizado para usar o blueprint
+    login_manager.login_view = 'auth.autenticar_login'  
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -45,7 +45,7 @@ def setup_routes(app):
                     id_endereco=row['ID_Endereco_FK'],
                     nome_restaurante=row['NomeRestaurante'],
                     email=row['Email'],
-                    senha=row['Senha'],  # Não gere hash novamente ao carregar do banco
+                    senha=row['Senha'],  
                     telefone=row['Telefone']
                 )
             
@@ -95,7 +95,7 @@ def setup_routes(app):
                     id_cliente=row['ID_Cliente'],
                     cpf=row['CPF'],
                     email=row['Email'],
-                    senha=row['Senha'],  # Não gere hash novamente ao carregar do banco
+                    senha=row['Senha'],
                     telefone=row['Telefone'],
                     nome=row['Nome'],
                     sobrenome=row['Sobrenome']
@@ -111,7 +111,7 @@ def setup_routes(app):
                     id_endereco=row['ID_Endereco_FK'],
                     nome_restaurante=row['NomeRestaurante'],
                     email=row['Email'],
-                    senha=row['Senha'],  # Não gere hash novamente ao carregar do banco
+                    senha=row['Senha'], 
                     telefone=row['Telefone']
                 )
 
@@ -348,7 +348,7 @@ def setup_routes(app):
             time_obj = datetime.strptime(time_str, '%H:%M')
             return time_obj.strftime('%H:%M')  # Retorna o formato XX:XX
         except ValueError:
-            return "00:00"  # Valor padrão caso haja erro no fo
+            return "00:00"  
     
     @app.route('/logout')
     @login_required

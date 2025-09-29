@@ -11,7 +11,12 @@ def cadastrar_comida():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)  # Use `dictionary=True` para retornar um dicionário
 
-    cursor.execute("SELECT * FROM prato WHERE ID_Restaurante_FK = %s", (current_user.id,))
+    cursor.execute("""
+        SELECT p.*, tp.Tipo as TipoPrato 
+        FROM prato p 
+        JOIN tipo_prato tp ON p.ID_TipoPrato_FK = tp.ID_TipoPrato 
+        WHERE p.ID_Restaurante_FK = %s
+    """, (current_user.id,))
     prato = cursor.fetchall()
 
     cursor.execute("SELECT * FROM restaurante WHERE ID_Restaurante = %s", (current_user.id,))
@@ -37,14 +42,9 @@ def submit_food():
     estoque = request.form['estoque']
     status = request.form['status']
 
-    # Convert status to appropriate value
     # O trigger automaticamente ajustará StatusDisponibilidade baseado no estoque
     status_value = 1 if status == 'ativo' else 0
-
-    # Generate a new UUID for the food item
     food_id = str(uuid.uuid4())
-
-    # Insert the new food item into the database
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -83,16 +83,12 @@ def editar_prato(food_id):
     tipos_prato = cursor.fetchall()
 
     if request.method == 'POST':
-        # Obter os novos dados do formulário
         food_name = request.form['food_name']
-        food_type = request.form['food_type']  # ID do tipo de prato
+        food_type = request.form['food_type']  
         description = request.form['description']
         price = request.form['price']
         estoque = request.form['estoque']
         status = request.form['status']
-
-        # Convert status to appropriate value
-        # O trigger automaticamente ajustará StatusDisponibilidade baseado no estoque
         status_value = 1 if status == 'ativo' else 0
 
         # Atualizar os dados no banco de dados
@@ -113,7 +109,6 @@ def editar_prato(food_id):
 
         return redirect(url_for('dishes.cadastrar_comida'))
 
-    # Se for GET, exibir o formulário com os dados do prato
     cursor.close()
     conn.close()
     return render_template('editar_prato.html', food=food, tipos_prato=tipos_prato)
@@ -199,7 +194,6 @@ def salvar_horarios():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Primeiro, deletar todos os horários existentes do restaurante
         print("DEBUG: Deletando horários existentes")
         cursor.execute("DELETE FROM horafuncionamento WHERE ID_Restaurante_FK = %s", (restaurante_id,))
         

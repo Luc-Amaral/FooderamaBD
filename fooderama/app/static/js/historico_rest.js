@@ -1,17 +1,17 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Remover código de mudança automática de status - vamos mostrar apenas o status real do banco
+ 
 
-  // NOVO: Sistema de auto-refresh para novos pedidos
+  
   let lastUpdateTime = null;
-  let lastKnownOrderCount = null; // Contar pedidos conhecidos
+  let lastKnownOrderCount = null; 
   let refreshInterval = null;
   let isPageVisible = true;
 
-  // Detectar quando a página fica visível/invisível
+  
   document.addEventListener("visibilitychange", function () {
     isPageVisible = !document.hidden;
     if (isPageVisible) {
-      checkForNewOrders(); // Verificar imediatamente quando voltar à página
+      checkForNewOrders();
     }
   });
 
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Função para verificar novos pedidos e atualizar a tabela
   async function checkForNewOrders() {
-    if (!isPageVisible) return; // Não atualizar se a página não estiver visível
+    if (!isPageVisible) return; 
 
     try {
       const response = await fetch("/api/get_restaurant_orders");
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log(
             `Contagem inicial definida: ${lastKnownOrderCount} pedidos`
           );
-          updateOrdersTable(data.orders); // Carregar a tabela inicial
+          updateOrdersTable(data.orders); 
           return;
         }
 
@@ -137,7 +137,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Função para mostrar notificação
   function showNotification(message) {
-    // Remover notificação existente se houver
     const existingNotification = document.querySelector(".notification-toast");
     if (existingNotification) {
       existingNotification.remove();
@@ -195,7 +194,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function startAutoRefresh() {
     console.log("Iniciando monitoramento de pedidos a cada 8 segundos...");
 
-    // Fazer primeira verificação após 2 segundos para carregar a tabela
     setTimeout(() => {
       checkForNewOrders();
     }, 2000);
